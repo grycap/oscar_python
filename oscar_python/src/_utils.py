@@ -1,6 +1,5 @@
 import base64
 import requests
-from rsa import verify
 
 """ Generic http request """
 def make_request(c , path, method, data="", token=""):
