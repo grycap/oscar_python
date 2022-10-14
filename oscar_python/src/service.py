@@ -15,16 +15,16 @@ class Service:
         self.cluster = cluster
 
     """ List all services from the """
-    def listServices(self):
-        return utils.makeRequest(self.cluster, _SVC_PATH, _GET)
+    def list_services(self):
+        return utils.make_request(self.cluster, _SVC_PATH, _GET)
     
-    def getService(self, name):
-        return utils.makeRequest(self.cluster, _SVC_PATH+"/"+name, _GET)
+    def get_service(self, name):
+        return utils.make_request(self.cluster, _SVC_PATH+"/"+name, _GET)
 
     """ Create a service on a specific cluster from a FDL file """
-    def createService(self, fdlPath):
-        with open(fdlPath, "r") as read_fdl:
-            fdl = self._parseFDLyaml(read_fdl)
+    def create_service(self, fdl_path):
+        with open(fdl_path, "r") as read_fdl:
+            fdl = self._parse_FDL_yaml(read_fdl)
         if fdl != ValueError:
             for element in fdl["functions"]["oscar"]:
                 try:
@@ -41,29 +41,28 @@ class Service:
 
                 # cpu parameter has to be string on the request
                 if type(svc["cpu"]) is int or type(svc["cpu"]) is float: svc["cpu"]= str(svc["cpu"])
-                print(json.dumps(svc))
-                return utils.makeRequest(self.cluster, _SVC_PATH, _POST, json.dumps(svc))
+                return utils.make_request(self.cluster, _SVC_PATH, _POST, json.dumps(svc))
         else:
             print("Error: Bad yaml format: {0}".format(fdl))
             return False
 
-    def removeService(self, name):
-        return utils.makeRequest(self.cluster, _SVC_PATH+"/"+name, _DELETE)
+    def remove_service(self, name):
+        return utils.make_request(self.cluster, _SVC_PATH+"/"+name, _DELETE)
 
-    def runService(self, name, input=""):
-        token = self._getToken(name)
-        if input: return utils.makeRequest(self.cluster, _RUN_PATH+"/"+name, _POST, input, token=token)
-        return utils.makeRequest(self.cluster, _RUN_PATH+"/"+name, _POST, token=token)
+    def run_service(self, name, input=""):
+        token = self._get_token(name)
+        if input: return utils.make_request(self.cluster, _RUN_PATH+"/"+name, _POST, input, token=token)
+        return utils.make_request(self.cluster, _RUN_PATH+"/"+name, _POST, token=token)
     
     #TODO get-file, put-file, list-files
 
-    def _getToken(self, svc):
-        service = utils.makeRequest(self.cluster, _SVC_PATH+"/"+svc, _GET)
+    def _get_token(self, svc):
+        service = utils.make_request(self.cluster, _SVC_PATH+"/"+svc, _GET)
         return service["token"]
 
-    def _parseFDLyaml(self, fdlPointer):
+    def _parse_FDL_yaml(self, fdl_read_pointer):
         try:
-            fdl_yaml = yaml.safe_load(fdlPointer)
+            fdl_yaml = yaml.safe_load(fdl_read_pointer)
         except ValueError as err:
             return err
         return fdl_yaml 
@@ -72,11 +71,11 @@ class Logs:
     def __init__(self, cluster: Cluster) -> None:
         self.cluster = cluster 
     
-    def getJobLogs(self, svc):
+    def get_job_logs(self, svc):
         pass
 
-    def listJobsLogs(self, svc):
+    def list_jobs_logs(self, svc):
         pass
 
-    def removeJobsLogs(self):
+    def remove_jobs_logs(self):
         pass
