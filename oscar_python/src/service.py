@@ -50,10 +50,16 @@ class Service:
     def removeService(self, name):
         return utils.makeRequest(self.cluster, _SVC_PATH+"/"+name, _DELETE)
 
-    def runService(self, name, input=None):
-        pass
-
+    def runService(self, name, input=""):
+        token = self._getToken(name)
+        if input: return utils.makeRequest(self.cluster, _RUN_PATH+"/"+name, _POST, input, token=token)
+        return utils.makeRequest(self.cluster, _RUN_PATH+"/"+name, _POST, token=token)
+    
     #TODO get-file, put-file, list-files
+
+    def _getToken(self, svc):
+        service = utils.makeRequest(self.cluster, _SVC_PATH+"/"+svc, _GET)
+        return service["token"]
 
     def _parseFDLyaml(self, fdlPointer):
         try:
