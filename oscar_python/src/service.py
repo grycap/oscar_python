@@ -70,8 +70,6 @@ class Service:
             return utils.make_request(self.cluster, "/job/"+name, _POST, file=files, token=token)
         return utils.make_request(self.cluster, "job/"+name, _POST, token=token)
 
-    #TODO get-file, put-file, list-files
-
     def _get_token(self, svc):
         service = utils.make_request(self.cluster, _SVC_PATH+"/"+svc, _GET)
         service = json.loads(service.text)

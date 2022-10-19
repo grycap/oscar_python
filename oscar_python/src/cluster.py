@@ -1,5 +1,3 @@
-import base64
-import requests
 import _utils as utils
 from rsa import verify
 
