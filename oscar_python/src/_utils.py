@@ -2,12 +2,13 @@ import base64
 import requests
 
 """ Generic http request """
-def make_request(c , path, method, data="", token=""):
+def make_request(c , path, method, data="", file="", token=""):
     url = c.endpoint+path
     headers = get_headers(c)
     if method == "post" or "put":
         if token: headers = get_headers_with_token(token)
         if data: return requests.request(method, url, headers=headers, verify=c.ssl, data=data)
+        if file: return requests.request(method, url, headers=headers, verify=c.ssl, files=file)
     return requests.request(method, url, headers=headers)
 
 """ Function to generate headers with basic authentication """
