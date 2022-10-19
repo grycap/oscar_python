@@ -5,6 +5,7 @@ import yaml
 
 _SVC_PATH = "/system/services"
 _RUN_PATH = "/run"
+_JOB_PATH = "/job"
 _GET = "get"
 _POST = "post"
 _PUT = "put"
@@ -54,17 +55,26 @@ class Service:
     def remove_service(self, name):
         return utils.make_request(self.cluster, _SVC_PATH+"/"+name, _DELETE)
 
-    """ Run a synchronous execute """
-    #TODO test
+    """ Run a synchronous execution """
     def run_service(self, name, input=""):
         token = self._get_token(name)
-        if input: return utils.make_request(self.cluster, _RUN_PATH+"/"+name, _POST, input, token=token)
+        if input: return utils.make_request(self.cluster, _RUN_PATH+"/"+name, _POST, input=input, token=token)
         return utils.make_request(self.cluster, _RUN_PATH+"/"+name, _POST, token=token)
     
+    """ Run an asynchronous execution """
+    #TODO fix
+    def run_job(self, name, input_path =""):
+        token = self._get_token(name)
+        if input:
+            files = {'input': open(input_path, "rb")}
+            return utils.make_request(self.cluster, "/job/"+name, _POST, file=files, token=token)
+        return utils.make_request(self.cluster, "job/"+name, _POST, token=token)
+
     #TODO get-file, put-file, list-files
 
     def _get_token(self, svc):
         service = utils.make_request(self.cluster, _SVC_PATH+"/"+svc, _GET)
+        service = json.loads(service.text)
         return service["token"]
 
     def _parse_FDL_yaml(self, fdl_read_pointer):
@@ -72,17 +82,4 @@ class Service:
             fdl_yaml = yaml.safe_load(fdl_read_pointer)
         except ValueError as err:
             return err
-        return fdl_yaml 
-
-class Logs:
-    def __init__(self, cluster: Cluster) -> None:
-        self.cluster = cluster 
-    
-    def get_job_logs(self, svc):
-        pass
-
-    def list_jobs_logs(self, svc):
-        pass
-
-    def remove_jobs_logs(self):
-        pass
+        return fdl_yaml
