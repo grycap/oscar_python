@@ -55,7 +55,7 @@ class Storage:
         elif provider == _ONE_DATA:
             return Onedata(credentials=creds)
         else:
-            print('error: storage provider "{0}" is not defined in service "{1}"'.format(storage_provider, self.svc_name))
+            print('Error: storage provider "{0}" is not defined in service "{1}"'.format(storage_provider, self.svc_name))
             return False
     
     """ The 'storage_provider' parameter follows the format:

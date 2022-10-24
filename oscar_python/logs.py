@@ -25,13 +25,13 @@ class Logs:
         self.cluster = cluster 
     
     def get_job_logs(self, svc, job):
-        return utils.make_request(self, _LOGS_PATH+"/"+svc+"/"+job, _GET)
+        return utils.make_request(self.cluster, _LOGS_PATH+"/"+svc+"/"+job, _GET)
 
     def list_jobs(self, svc):
-        return utils.make_request(self, _LOGS_PATH+"/"+svc, _GET)
+        return utils.make_request(self.cluster, _LOGS_PATH+"/"+svc, _GET)
 
     def remove_job(self, svc, job):
-        return utils.make_request(self, _LOGS_PATH+"/"+svc+"/"+job, _DELETE)
+        return utils.make_request(self.cluster, _LOGS_PATH+"/"+svc+"/"+job, _DELETE)
 
     def remove_all_jobs(self, svc):
-        return utils.make_request(self, _LOGS_PATH+"/"+svc, _DELETE)
+        return utils.make_request(self.cluster, _LOGS_PATH+"/"+svc, _DELETE)
