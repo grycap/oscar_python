@@ -29,7 +29,7 @@ setup(name='oscar_python',
       license='Apache 2.0',
       packages=find_namespace_packages(),
       install_requires=[
-          'webdavclient3 == 3.14.6'
+          'webdavclient3 == 3.14.6',
           'requests',
           'boto3',
           'setuptools >= 40.8.0',
