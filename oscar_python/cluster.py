@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License. 
 
-import _utils as utils
+import oscar_python._utils as utils
 
 _INFO_PATH = "/system/info"
 _CONFIG_PATH = "/system/config"

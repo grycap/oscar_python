@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License. 
 
-from _providers._minio import Minio
-from _providers._webdav import WebDav
-from _providers._s3 import S3
-from _providers._onedata import Onedata
-import _utils as utils
+from oscar_python._providers._minio import Minio
+from oscar_python._providers._webdav import WebDav
+from oscar_python._providers._s3 import S3
+from oscar_python._providers._onedata import Onedata
+import oscar_python._utils as utils
 import json
 
 _MINIO = "minio"

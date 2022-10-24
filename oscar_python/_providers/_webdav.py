@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License. 
 
-from _providers._providers_base import StorageProvider
+from oscar_python._providers._providers_base import StorageProvider
 from webdav3.client import Client
 from webdav3.exceptions import WebDavException
 

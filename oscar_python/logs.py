@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License. 
 
-from cluster import Cluster
-import _utils as utils
+from oscar_python.cluster import Cluster
+import oscar_python._utils as utils
 
 _LOGS_PATH = "/system/logs"
 _GET = "get"
