@@ -15,7 +15,7 @@
 from aiohttp import ClientError
 import logging
 import boto3
-from _providers._providers_base import StorageProvider
+from oscar_python._providers._providers_base import StorageProvider
 
 class S3(StorageProvider):
     def __init__(self, credentials) -> None:

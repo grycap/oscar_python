@@ -33,7 +33,8 @@ setup(name='oscar_python',
           'requests',
           'boto3',
           'setuptools >= 40.8.0',
-          'pyyaml'
+          'pyyaml',
+          'aiohttp'
       ],
       classifiers=[
           'Programming Language :: Python :: 3',
