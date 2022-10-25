@@ -66,16 +66,15 @@ class S3(StorageProvider):
             except ClientError as err:
                 print("Error uploading file: ", err)
                 return False
-        
+
     def download_file(self, local_path, remote_path):
         bucket_name = remote_path.split('/')[0]
-        bucket = self.resource.Bucket(bucket_name)
         file_key = remote_path.split('/',1)[1]
         file_path = local_path+"/"+remote_path.split('/')[-1]
         print("Downloading from bucket '{0}' to path '{1}' with key '{2}'".format(bucket_name, file_path, file_key))
         with open(file_path, 'wb') as data:
             try:
-                bucket.download_fileobj(file_key, data)
+                self.client.download_fileobj(bucket_name, file_key, data)
             except ClientError as err:
                 print("Error downloading file: ", err)
                 return False
