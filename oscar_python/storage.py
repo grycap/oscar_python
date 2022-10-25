@@ -27,14 +27,14 @@ _SVC_PATH = "/system/services"
 
 #TODO check returns from functions
 class Storage:
-    def __init__(self, service, svc_name) -> None:
-        self.service = service
+    def __init__(self, client_obj, svc_name) -> None:
+        self.client_obj = client_obj
         self.svc_name = svc_name
         self._store_providers()
 
     """ Function to store all the providers of the service """
     def _store_providers(self):
-        svc = utils.make_request(self.service.cluster, _SVC_PATH+"/"+self.svc_name, "get")
+        svc = utils.make_request(self.client_obj, _SVC_PATH+"/"+self.svc_name, "get")
         self.storage_providers = json.loads(svc.text)["storage_providers"]
     
     """ Function to retreive credentials of a specific storage provider """
