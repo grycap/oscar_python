@@ -1,5 +1,8 @@
 ## Python OSCAR API
 
+[![Build](https://github.com/grycap/oscar_python/actions/workflows/main.yaml/badge.svg)](https://github.com/grycap/oscar_python/actions/workflows/main.yaml)
+![PyPI](https://img.shields.io/pypi/v/oscar_python)
+
 ### Sample usage
 
 ``` python
