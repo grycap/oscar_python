@@ -110,7 +110,7 @@ class Client:
     """ Run a synchronous execution """
     def run_service(self, name, input=""):
         token = self._get_token(name)
-        if input: return utils.make_request(self, _RUN_PATH+"/"+name, _POST, input=input, token=token)
+        if input: return utils.make_request(self, _RUN_PATH+"/"+name, _POST, data=input, token=token)
         return utils.make_request(self, _RUN_PATH+"/"+name, _POST, token=token)
     
     """ Run an asynchronous execution (not usable at the moment). """
