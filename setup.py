@@ -18,8 +18,13 @@ from setuptools import setup, find_namespace_packages
 with open('README.md', mode='r', encoding='utf-8') as f:
     readme = f.read()
 
+# Load version
+with open('version.py', mode='r', encoding='utf-8') as f:
+    exec(f.read())
+
+
 setup(name='oscar_python',
-      version=1.0,
+      version=__version__,
       description='OSCAR API for python',
       long_description=readme,
       long_description_content_type='text/markdown',

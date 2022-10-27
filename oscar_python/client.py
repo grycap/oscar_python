@@ -35,7 +35,7 @@ _POST = "post"
 _PUT = "put"
 _DELETE = "delete"
 
-class OSCARClient:
+class Client:
     #Cluster info 
     def __init__(self, id, endpoint, user, password, ssl) -> None:
         self.id = id
