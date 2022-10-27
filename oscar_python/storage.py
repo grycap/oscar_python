@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License. 
 
-from _providers._minio import Minio
-from _providers._webdav import WebDav
-from _providers._s3 import S3
-from _providers._onedata import Onedata
-import _utils as utils
+from oscar_python._providers._minio import Minio
+from oscar_python._providers._webdav import WebDav
+from oscar_python._providers._s3 import S3
+from oscar_python._providers._onedata import Onedata
+import oscar_python._utils as utils
 import json
 
 _MINIO = "minio"
@@ -27,14 +27,14 @@ _SVC_PATH = "/system/services"
 
 #TODO check returns from functions
 class Storage:
-    def __init__(self, service, svc_name) -> None:
-        self.service = service
+    def __init__(self, client_obj, svc_name) -> None:
+        self.client_obj = client_obj
         self.svc_name = svc_name
         self._store_providers()
 
     """ Function to store all the providers of the service """
     def _store_providers(self):
-        svc = utils.make_request(self.service.cluster, _SVC_PATH+"/"+self.svc_name, "get")
+        svc = utils.make_request(self.client_obj, _SVC_PATH+"/"+self.svc_name, "get")
         self.storage_providers = json.loads(svc.text)["storage_providers"]
     
     """ Function to retreive credentials of a specific storage provider """
@@ -55,7 +55,7 @@ class Storage:
         elif provider == _ONE_DATA:
             return Onedata(credentials=creds)
         else:
-            print('error: storage provider "{0}" is not defined in service "{1}"'.format(storage_provider, self.svc_name))
+            print('Error: storage provider "{0}" is not defined in service "{1}"'.format(storage_provider, self.svc_name))
             return False
     
     """ The 'storage_provider' parameter follows the format:

@@ -13,7 +13,7 @@
 # limitations under the License. 
 
 import boto3
-from _providers._s3 import S3
+from oscar_python._providers._s3 import S3
 
 _DEFAULT_MINIO_ENDPOINT = 'http://minio-service.minio:9000'
 
