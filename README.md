@@ -4,8 +4,10 @@
 ![PyPI](https://img.shields.io/pypi/v/oscar_python)
 
 ### Contents
-- [Sample usage](#sample-usage)
-- [API methods](#api-methods)
+- [Python OSCAR API](#python-oscar-api)
+  - [Contents](#contents)
+  - [Sample usage](#sample-usage)
+  - [API methods](#api-methods)
     - [Cluster methods](#cluster-methods)
     - [Service methods](#service-methods)
     - [Logs methods](#logs-methods)
@@ -68,6 +70,8 @@ service = client.get_service("service_name") # returns an http response
 # get a list of all the services deployed 
 services = client.list_services() # returns an http response
 ```
+
+> _Note_ : Both `path_to_fdl` and the script path inside the fdl must be absolute.
 
 **create_service**
 ``` python
