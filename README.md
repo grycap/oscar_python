@@ -34,7 +34,7 @@ from oscar_python.client import Client
 
 client = Client("cluster-id","https://cluster-endpoint", "username", "password", True)
 
-err = client.create_service("/somepath/cowsay.yaml")
+err = client.create_service("/absolute_path/cowsay.yaml")
 if not err:
     res = client.run_service("cowsay", '{"message": "Hi there"}')   
     if res.status_code == 200:
