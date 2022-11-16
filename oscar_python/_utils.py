@@ -23,7 +23,7 @@ def make_request(c , path, method, data="", file="", token=""):
         if token: headers = get_headers_with_token(token)
         if data: return requests.request(method, url, headers=headers, verify=c.ssl, data=data)
         if file: return requests.request(method, url, headers=headers, verify=c.ssl, files=file)
-    return requests.request(method, url, headers=headers)
+    return requests.request(method, url, headers=headers, verify=c.ssl)
 
 """ Function to generate headers with basic authentication """
 def get_headers(c):
