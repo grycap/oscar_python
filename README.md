@@ -32,7 +32,7 @@ except Exception as err:
   print("Failed with: ", err)
 ```
 
-- Sample code to create a simple service with the [cowsay [example](https://github.com/grycap/oscar/tree/master/examples/cowsay) and afterward make a synchronous invocation.
+- Sample code to create a simple service with the [cowsay example](https://github.com/grycap/oscar/tree/master/examples/cowsay) and make a synchronous invocation.
 
 ``` python
 from oscar_python.client import Client
