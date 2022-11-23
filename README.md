@@ -3,6 +3,8 @@
 [![Build](https://github.com/grycap/oscar_python/actions/workflows/main.yaml/badge.svg)](https://github.com/grycap/oscar_python/actions/workflows/main.yaml)
 ![PyPI](https://img.shields.io/pypi/v/oscar_python)
 
+This package provides an API to interact with OSCAR (https://oscar.grycap.net) clusters and services. It is available on Pypi with the name [oscar-python](https://pypi.org/project/oscar-python/).
+
 ### Contents
 - [Python OSCAR API](#python-oscar-api)
   - [Contents](#contents)
@@ -23,22 +25,27 @@ from oscar_python.client import Client
 client = Client("cluster-id","https://cluster-endpoint", "username", "password", True)
 
 # get the cluster information
-info = client.get_cluster_info()
-print(info.text)
+try:
+  info = client.get_cluster_info()
+  print(info.text)
+except Exception as err:
+  print("Failed with: ", err)
 ```
 
-- Sample code to create a simple service with the [cowsay example](https://github.com/grycap/oscar/tree/master/examples/cowsay) and afterwards make a synchronous invocation.
+- Sample code to create a simple service with the [cowsay [example](https://github.com/grycap/oscar/tree/master/examples/cowsay) and afterward make a synchronous invocation.
 
 ``` python
 from oscar_python.client import Client
 
 client = Client("cluster-id","https://cluster-endpoint", "username", "password", True)
 
-err = client.create_service("/absolute_path/cowsay.yaml")
-if not err:
-    res = client.run_service("cowsay", '{"message": "Hi there"}')   
-    if res.status_code == 200:
-        print(res.text)
+try:
+  client.create_service("/absolute_path/cowsay.yaml")
+  res = client.run_service("cowsay", '{"message": "Hi there"}')   
+  if res.status_code == 200:
+      print(res.text)
+except Exception as err:
+  print("Failed with: ", err)
 ```
 
 ### API methods
@@ -48,13 +55,13 @@ if not err:
 **get_cluster_info**
 ``` python
 # get the cluster information
-info = client.get_cluster_info() # returns an http response
+info = client.get_cluster_info() # returns an HTTP response or an HTTPError
 ```
 
 **get_cluster_config**
 ``` python
 # get the cluster config
-config = client.get_cluster_config() # returns an http response
+config = client.get_cluster_config() # returns an http response or an HTTPError
 ```
 
 #### Service methods
@@ -62,13 +69,13 @@ config = client.get_cluster_config() # returns an http response
 **get_service**
 ``` python
 # get the definition of a service 
-service = client.get_service("service_name") # returns an http response
+service = client.get_service("service_name") # returns an http response or an HTTPError
 ```
 
 **list_services**
 ``` python
 # get a list of all the services deployed 
-services = client.list_services() # returns an http response
+services = client.list_services() # returns an http response or an HTTPError
 ```
 
 > _Note_ : Both `path_to_fdl` and the script path inside the fdl must be absolute.
@@ -93,7 +100,7 @@ response = client.remove_service("service_name") # returns an http response
 
 **run_service**
 
-The `input` parameter may not be passed if the function doesn't require an input.
+The `input` parameter may not be passed if the function doesn't require input.
 
 ``` python
 # make a synchronous execution 
@@ -129,7 +136,7 @@ response = client.remove_all_jobs("service_name") # returns an http response
 
 #### Storage usage
 
-You can create a storage object to operate over the different storage providers defined on a service with the method `create_storage_client` as it follows:
+You can create a storage object to operate over the different storage providers defined on a service with the method `create_storage_client` as follows:
 
 ``` python
 storage_service = client.create_storage_client("service_name") # returns a storage object
@@ -138,7 +145,7 @@ storage_service = client.create_storage_client("service_name") # returns a stora
 
 **list_files_from_path**
 
-This method returns a json with the info except for Onedata, which returns an http response.
+This method returns a JSON with the info except for OneData, which returns an HTTP response.
 
 ``` python
 # get a list of the files of one of the service storage provider 
