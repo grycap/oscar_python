@@ -16,14 +16,22 @@ import base64
 import requests
 
 """ Generic http request """
-def make_request(c , path, method, data="", file="", token=""):
+def make_request(c , path, method, **kwargs):
     url = c.endpoint+path
     headers = get_headers(c)
-    if method == "post" or "put":
-        if token: headers = get_headers_with_token(token)
-        if data: return requests.request(method, url, headers=headers, verify=c.ssl, data=data)
-        if file: return requests.request(method, url, headers=headers, verify=c.ssl, files=file)
-    return requests.request(method, url, headers=headers, verify=c.ssl)
+    if method in ["post", "put"]:
+        if "token" in kwargs.keys() and kwargs["token"]: 
+            headers = get_headers_with_token(kwargs["token"])
+        if "data" in kwargs.keys() and kwargs["data"]:
+            result = requests.request(method, url, headers=headers, verify=c.ssl, data=kwargs["data"])
+    else:
+        result = requests.request(method, url, headers=headers, verify=c.ssl)
+
+    if "handle" in kwargs.keys() and kwargs["handle"] == False:
+        return result
+
+    result.raise_for_status()
+    return result
 
 """ Function to generate headers with basic authentication """
 def get_headers(c):
@@ -34,3 +42,6 @@ def get_headers(c):
 """ Function to generate headers with token auth """
 def get_headers_with_token(token):
     return {"Authorization": "Bearer "+ str(token)}
+
+def raise_http_errors(response):
+    response.raise_for_status()

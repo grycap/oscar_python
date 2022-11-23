@@ -70,38 +70,41 @@ class Client:
     def _apply_service(self, fdl_path, method):
         with open(fdl_path, "r") as read_fdl:
             fdl = self._parse_FDL_yaml(read_fdl)
+        # Read FDL file and check correct format
         if fdl != ValueError:
             for element in fdl["functions"]["oscar"]:
                 try:
                     svc = element[self.id]
                 except KeyError as err:
-                    print("Error: FDL clusterID don't match current clusterID: {0}".format(err))
-                    return err
+                    raise("FDL clusterID does not match current clusterID: {0}".format(err))
+                # Check if service already exists when the function is called from create_service
+                if method == _POST:
+                    svc_exists = utils.make_request(self, _SVC_PATH+"/"+svc["name"], _GET, handle=False)
+                    if svc_exists.status_code == 200:
+                        raise ValueError("A service with name '{0}' is already present on the cluster".format(svc["name"]))
                 try:
                     with open(svc["script"]) as s:
                         svc["script"] = s.read()
                 except IOError as err:
-                    print("Error: Couldn't read script")
-                    return err
+                    raise("Bouldn't read script")
 
                 # cpu parameter has to be string on the request
                 if type(svc["cpu"]) is int or type(svc["cpu"]) is float: svc["cpu"]= str(svc["cpu"])
-                return utils.make_request(self, _SVC_PATH, method, json.dumps(svc))
+                utils.make_request(self, _SVC_PATH, method, data=json.dumps(svc))
         else:
-            print("Error: Bad yaml format: {0}".format(fdl))
-            return ValueError
+            raise ValueError("Bad yaml format: {0}".format(fdl))
 
     """ Create a service on the current cluster from a FDL file """
     def create_service(self, fdl_path):
-        self._apply_service(fdl_path, _POST)
+        return self._apply_service(fdl_path, _POST)
 
     """ Update a specific service """
     def update_service(self, name, fdl_path):
-        svc = self.get_service(name)
+        # Check if service exists before update
+        svc = utils.make_request(self, _SVC_PATH+"/"+svc["name"], _GET, handle=False)
         if svc.status_code != 200:
-            print("Error: the service {0} is not present on the cluster".format(name))
-            return
-        self._apply_service(fdl_path, _PUT)
+            raise ValueError("The service {0} is not present on the cluster".format(name))
+        return self._apply_service(fdl_path, _PUT)
 
     """ Remove a specific service """
     def remove_service(self, name):
@@ -114,13 +117,10 @@ class Client:
         return utils.make_request(self, _RUN_PATH+"/"+name, _POST, token=token)
     
     """ Run an asynchronous execution (not usable at the moment). """
-    #TODO fix
+    #TODO
     """ def _run_job(self, name, input_path =""):
-        token = self._get_token(name)
-        if input:
-            files = {'input': open(input_path, "rb")}
-            return utils.make_request(self, "/job/"+name, _POST, file=files, token=token)
-        return utils.make_request(self, "job/"+name, _POST, token=token) """
+            pass 
+    """
 
     def _get_token(self, svc):
         service = utils.make_request(self, _SVC_PATH+"/"+svc, _GET)
@@ -134,14 +134,18 @@ class Client:
             return err
         return fdl_yaml
     
+    """ Get logs of a service job """
     def get_job_logs(self, svc, job):
         return utils.make_request(self, _LOGS_PATH+"/"+svc+"/"+job, _GET)
-
+    
+    """ List a service jobs """
     def list_jobs(self, svc):
         return utils.make_request(self, _LOGS_PATH+"/"+svc, _GET)
 
+    """ Remove a service job """
     def remove_job(self, svc, job):
         return utils.make_request(self, _LOGS_PATH+"/"+svc+"/"+job, _DELETE)
 
+    """ Remove all service jobs """
     def remove_all_jobs(self, svc):
         return utils.make_request(self, _LOGS_PATH+"/"+svc, _DELETE)
