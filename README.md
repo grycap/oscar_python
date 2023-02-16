@@ -168,15 +168,15 @@ response = storage_service.download_file("storage_provider", "local_path", "remo
 
 ### Problems that could appear
 
-#### Read a file
+#### Read an image
 
-A service could fail if the input is a file and the input data is not well encoded.
+A service could fail if the input is an image and the input data is not well encoded.
 To run a service with a file. It is necessary to read the file as binary and encode the content into base64.
 
 ``` python
 import base64
 
-with open('logo.png', 'rb') as binary_file:
+with open('path/to/image', 'rb') as binary_file:
     binary_file_data = binary_file.read()
     base64_encoded_data = base64.b64encode(binary_file_data)
     base64_message = base64_encoded_data.decode('utf-8')
