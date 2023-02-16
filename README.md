@@ -14,6 +14,8 @@ This package provides an API to interact with OSCAR (https://oscar.grycap.net) c
     - [Service methods](#service-methods)
     - [Logs methods](#logs-methods)
     - [Storage usage](#storage-usage)
+  - [Problems](#problems-that-could-appear)
+    - [Read File](#read-a-file)
 
 ### Sample usage
 
@@ -164,8 +166,20 @@ response = storage_service.upload_file("storage_provider", "local_path", "remote
 response = storage_service.download_file("storage_provider", "local_path", "remote_path")
 ```
 
+### Problems that could appear
 
+#### Read a file
 
+A service could fail if the input is a file and the input data is not well encoded.
+To run a service with a file. It is necessary to read the file as binary and encode the content into base64.
 
+``` python
+import base64
 
+with open('logo.png', 'rb') as binary_file:
+    binary_file_data = binary_file.read()
+    base64_encoded_data = base64.b64encode(binary_file_data)
+    base64_message = base64_encoded_data.decode('utf-8')
 
+    print(base64_message)
+```
