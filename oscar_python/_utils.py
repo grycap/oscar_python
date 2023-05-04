@@ -13,23 +13,25 @@
 # limitations under the License. 
 
 import base64
+import json
+import os
 import requests
 
 """ Generic http request """
 def make_request(c , path, method, **kwargs):
     url = c.endpoint+path
-    headers = get_headers(c)
+    headers = get_headers(c)  
     if method in ["post", "put"]:
         if "token" in kwargs.keys() and kwargs["token"]: 
             headers = get_headers_with_token(kwargs["token"])
         if "data" in kwargs.keys() and kwargs["data"]:
-            result = requests.request(method, url, headers=headers, verify=c.ssl, data=kwargs["data"])
+            result = requests.request(method, url, headers=headers, verify=c.ssl, data=kwargs["data"], timeout=kwargs["timeout"])
     else:
-        result = requests.request(method, url, headers=headers, verify=c.ssl)
+        result = requests.request(method, url, headers=headers, verify=c.ssl, timeout=kwargs["timeout"])
 
     if "handle" in kwargs.keys() and kwargs["handle"] == False:
         return result
-
+    
     result.raise_for_status()
     return result
 
@@ -43,5 +45,51 @@ def get_headers(c):
 def get_headers_with_token(token):
     return {"Authorization": "Bearer "+ str(token)}
 
-def raise_http_errors(response):
-    response.raise_for_status()
+def write_file(content, file_path):
+    with open(file_path, 'w') as f:
+        f.write(content)
+
+def isBase64(st):
+    try:
+        base64.b64decode(st)
+        return True
+    except:
+        return False
+
+def decode_b64(b64_str, file_out):
+    file_extension = os.path.splitext(file_out)[1]
+    try:
+        decoded_data = base64.b64decode(b64_str)
+
+        if file_extension in [".txt", ".json"]:
+            decode = 'w'
+            decoded_data = decoded_data.decode("utf-8")
+        else:
+            decode = 'wb' 
+
+        with open(file_out, decode) as f:
+            f.write(decoded_data)
+
+    except ValueError:
+        print('Error decoding output: Invalid base64 string.')
+    except OSError:
+        print('Error decoding output: Failed to write decoded data to file.')   
+
+def encode_input(file_in):
+    try:
+        with open(file_in, 'rb') as file:
+            return base64.b64encode(file.read())
+    except FileNotFoundError:
+        print('Error encoding input: File {0} not found.'.format(file_in))
+    except OSError:
+        print('Error encoding input: Failed to read file.')
+
+def decode_output(output, file_path):
+    if(isBase64(output)):
+        decode_b64(output, file_path)
+        return
+    if(isinstance(output,str)):
+        write_file(output,file_path)
+        return
+
+ 

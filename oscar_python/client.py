@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License. 
 
+import base64
+import os
 import json
 import yaml
 import oscar_python._utils as utils
@@ -34,6 +36,7 @@ _GET = "get"
 _POST = "post"
 _PUT = "put"
 _DELETE = "delete"
+_DEFAULT_TIMEOUT = 30
 
 class Client:
     #Cluster info 
@@ -86,7 +89,7 @@ class Client:
                     with open(svc["script"]) as s:
                         svc["script"] = s.read()
                 except IOError as err:
-                    raise("Bouldn't read script")
+                    raise("Couldn't read script")
 
                 # cpu parameter has to be string on the request
                 if type(svc["cpu"]) is int or type(svc["cpu"]) is float: svc["cpu"]= str(svc["cpu"])
@@ -110,10 +113,31 @@ class Client:
     def remove_service(self, name):
         return utils.make_request(self, _SVC_PATH+"/"+name, _DELETE)
 
-    """ Run a synchronous execution """
-    def run_service(self, name, input=""):
-        token = self._get_token(name)
-        if input: return utils.make_request(self, _RUN_PATH+"/"+name, _POST, data=input, token=token)
+    """ Run a synchronous execution. 
+        If an output is provided the result is decoded onto the file.
+        In both cases the function returns the HTTP response."""
+    def run_service(self, name, **kwargs):
+        if "timeout" in kwargs.keys() and kwargs["timeout"]:
+            timeout=kwargs["timeout"]
+        else:
+            timeout = _DEFAULT_TIMEOUT
+        if "input" in kwargs.keys() and kwargs["input"]:
+            exec_input = kwargs["input"]
+            token = self._get_token(name) 
+            split_in = os.path.splitext(exec_input)
+
+            if split_in[1] == '':
+                message_bytes = exec_input.encode('ascii')
+                b64_input = base64.b64encode(message_bytes)
+                response = utils.make_request(self, _RUN_PATH+"/"+name, _POST, data=b64_input, token=token, timeout=timeout)
+            else:
+                encoded_input = utils.encode_input(exec_input)
+                response = utils.make_request(self, _RUN_PATH+"/"+name, _POST, data=encoded_input, token=token, timeout=timeout)
+
+            if "output" in kwargs.keys() and kwargs["output"]:
+                utils.decode_output(response.text, kwargs["output"])
+            return response
+        
         return utils.make_request(self, _RUN_PATH+"/"+name, _POST, token=token)
     
     """ Run an asynchronous execution (not usable at the moment). """
