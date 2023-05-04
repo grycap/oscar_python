@@ -1,4 +1,4 @@
-## Python OSCAR API
+## Python OSCAR client
 
 [![Build](https://github.com/grycap/oscar_python/actions/workflows/main.yaml/badge.svg)](https://github.com/grycap/oscar_python/actions/workflows/main.yaml)
 ![PyPI](https://img.shields.io/pypi/v/oscar_python)
@@ -6,10 +6,10 @@
 This package provides a client to interact with OSCAR (https://oscar.grycap.net) clusters and services. It is available on Pypi with the name [oscar-python](https://pypi.org/project/oscar-python/).
 
 ### Contents
-- [Python OSCAR API](#python-oscar-api)
+- [Python OSCAR client](#python-oscar-client)
   - [Contents](#contents)
   - [Sample usage](#sample-usage)
-  - [API methods](#api-methods)
+  - [Client methods](#client-methods)
     - [Cluster methods](#cluster-methods)
     - [Service methods](#service-methods)
     - [Logs methods](#logs-methods)
@@ -48,7 +48,7 @@ except Exception as err:
   print("Failed with: ", err)
 ```
 
-### API methods
+### Client methods
 
 #### Cluster methods
 
