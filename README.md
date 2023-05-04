@@ -105,7 +105,6 @@ response = client.remove_service("service_name") # returns an http response
 ``` python
 # make a synchronous execution 
 response = client.run_service("service_name", input="input", output="out.png", timeout=100) # returns an http response
-
 ```
 
 #### Logs methods
@@ -163,9 +162,3 @@ response = storage_service.upload_file("storage_provider", "local_path", "remote
 # download a file from a remote path to a local path 
 response = storage_service.download_file("storage_provider", "local_path", "remote_path")
 ```
-
-
-
-
-
-
