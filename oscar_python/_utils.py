@@ -16,18 +16,26 @@ import base64
 import json
 import os
 import requests
+_DEFAULT_TIMEOUT = 30
 
 """ Generic http request """
 def make_request(c , path, method, **kwargs):
+
+    if "timeout" in kwargs.keys() and kwargs["timeout"]: 
+        timeout = kwargs["timeout"]
+        print("timeout set to: ", timeout)
+    else: 
+        timeout = _DEFAULT_TIMEOUT
+
     url = c.endpoint+path
     headers = get_headers(c)  
     if method in ["post", "put"]:
         if "token" in kwargs.keys() and kwargs["token"]: 
             headers = get_headers_with_token(kwargs["token"])
         if "data" in kwargs.keys() and kwargs["data"]:
-            result = requests.request(method, url, headers=headers, verify=c.ssl, data=kwargs["data"], timeout=kwargs["timeout"])
+            result = requests.request(method, url, headers=headers, verify=c.ssl, data=kwargs["data"], timeout=timeout)
     else:
-        result = requests.request(method, url, headers=headers, verify=c.ssl, timeout=kwargs["timeout"])
+        result = requests.request(method, url, headers=headers, verify=c.ssl, timeout=timeout)
 
     if "handle" in kwargs.keys() and kwargs["handle"] == False:
         return result
@@ -45,7 +53,7 @@ def get_headers(c):
 def get_headers_with_token(token):
     return {"Authorization": "Bearer "+ str(token)}
 
-def write_file(content, file_path):
+def write_text_file(content, file_path):
     with open(file_path, 'w') as f:
         f.write(content)
 
@@ -75,21 +83,25 @@ def decode_b64(b64_str, file_out):
     except OSError:
         print('Error decoding output: Failed to write decoded data to file.')   
 
-def encode_input(file_in):
-    try:
-        with open(file_in, 'rb') as file:
-            return base64.b64encode(file.read())
-    except FileNotFoundError:
-        print('Error encoding input: File {0} not found.'.format(file_in))
-    except OSError:
-        print('Error encoding input: Failed to read file.')
+def encode_input(data):
+    if os.path.isfile(data):
+        try:
+            with open(data, 'rb') as file:
+                return base64.b64encode(file.read())
+        except FileNotFoundError:
+            print('Error encoding input: File {0} not found.'.format(data))
+        except OSError:
+            print('Error encoding input: Failed to read file.')
+    else:
+        message_bytes = data.encode('ascii')
+        return base64.b64encode(message_bytes)
 
 def decode_output(output, file_path):
     if(isBase64(output)):
         decode_b64(output, file_path)
         return
     if(isinstance(output,str)):
-        write_file(output,file_path)
+        write_text_file(output,file_path)
         return
 
  

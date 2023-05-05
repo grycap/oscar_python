@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License. 
 
-import base64
 import os
 import json
 import yaml
@@ -117,30 +116,24 @@ class Client:
         If an output is provided the result is decoded onto the file.
         In both cases the function returns the HTTP response."""
     def run_service(self, name, **kwargs):
-        if "timeout" in kwargs.keys() and kwargs["timeout"]:
-            timeout=kwargs["timeout"]
-        else:
-            timeout = _DEFAULT_TIMEOUT
         if "input" in kwargs.keys() and kwargs["input"]:
             exec_input = kwargs["input"]
             token = self._get_token(name) 
-            split_in = os.path.splitext(exec_input)
+            
+            send_data = utils.encode_input(exec_input)
 
-            if split_in[1] == '':
-                message_bytes = exec_input.encode('ascii')
-                b64_input = base64.b64encode(message_bytes)
-                response = utils.make_request(self, _RUN_PATH+"/"+name, _POST, data=b64_input, token=token, timeout=timeout)
+            if "timeout" in kwargs.keys() and kwargs["timeout"]:
+                response = utils.make_request(self, _RUN_PATH+"/"+name, _POST, data=send_data, token=token, timeout=kwargs["timeout"])
             else:
-                encoded_input = utils.encode_input(exec_input)
-                response = utils.make_request(self, _RUN_PATH+"/"+name, _POST, data=encoded_input, token=token, timeout=timeout)
-
+                response = utils.make_request(self, _RUN_PATH+"/"+name, _POST, data=send_data, token=token)
+            
             if "output" in kwargs.keys() and kwargs["output"]:
                 utils.decode_output(response.text, kwargs["output"])
             return response
         
         return utils.make_request(self, _RUN_PATH+"/"+name, _POST, token=token)
     
-    """ Run an asynchronous execution (not usable at the moment). """
+    """ Run an asynchronous execution (unable at the moment). """
     #TODO
     """ def _run_job(self, name, input_path =""):
             pass 
