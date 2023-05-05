@@ -23,7 +23,6 @@ def make_request(c , path, method, **kwargs):
 
     if "timeout" in kwargs.keys() and kwargs["timeout"]: 
         timeout = kwargs["timeout"]
-        print("timeout set to: ", timeout)
     else: 
         timeout = _DEFAULT_TIMEOUT
 
