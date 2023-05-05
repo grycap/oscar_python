@@ -1,15 +1,15 @@
-## Python OSCAR API
+## Python OSCAR client
 
 [![Build](https://github.com/grycap/oscar_python/actions/workflows/main.yaml/badge.svg)](https://github.com/grycap/oscar_python/actions/workflows/main.yaml)
 ![PyPI](https://img.shields.io/pypi/v/oscar_python)
 
-This package provides an API to interact with OSCAR (https://oscar.grycap.net) clusters and services. It is available on Pypi with the name [oscar-python](https://pypi.org/project/oscar-python/).
+This package provides a client to interact with OSCAR (https://oscar.grycap.net) clusters and services. It is available on Pypi with the name [oscar-python](https://pypi.org/project/oscar-python/).
 
 ### Contents
-- [Python OSCAR API](#python-oscar-api)
+- [Python OSCAR client](#python-oscar-client)
   - [Contents](#contents)
   - [Sample usage](#sample-usage)
-  - [API methods](#api-methods)
+  - [Client methods](#client-methods)
     - [Cluster methods](#cluster-methods)
     - [Service methods](#service-methods)
     - [Logs methods](#logs-methods)
@@ -41,14 +41,14 @@ client = Client("cluster-id","https://cluster-endpoint", "username", "password",
 
 try:
   client.create_service("/absolute_path/cowsay.yaml")
-  res = client.run_service("cowsay", '{"message": "Hi there"}')   
-  if res.status_code == 200:
-      print(res.text)
+  response = client.run_service("cowsay", input = '{"message": "Hi there"}')   
+  if response.status_code == 200:
+      print(response.text)
 except Exception as err:
   print("Failed with: ", err)
 ```
 
-### API methods
+### Client methods
 
 #### Cluster methods
 
@@ -100,25 +100,11 @@ response = client.remove_service("service_name") # returns an http response
 
 **run_service**
 
-The `input` parameter may not be passed if the function doesn't require input.
+ *`input`, `output` and `timeout` are optional parameters.*
 
 ``` python
 # make a synchronous execution 
-response = client.run_service("service_name", input="input") # returns an http response
-```
-
-A service could fail if the input is an image and the input data is not well encoded.
-To run a service with an image. It is necessary to read the file as binary and encode the content into base64.
-
-``` python
-import base64
-
-with open('path/to/image', 'rb') as binary_file:
-    binary_file_data = binary_file.read()
-    base64_encoded_data = base64.b64encode(binary_file_data)
-    base64_message = base64_encoded_data.decode('utf-8')
-
-    print(base64_message)
+response = client.run_service("service_name", input="input", output="out.png", timeout=100) # returns an http response
 ```
 
 #### Logs methods
