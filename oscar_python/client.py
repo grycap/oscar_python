@@ -57,10 +57,6 @@ class Client:
     def set_auth_type(self, options):
         if 'user' in options:
             self._AUTH_TYPE = "basicauth"
-            try:
-                self.get_cluster_info()
-            except:
-               print("")
         elif 'shortname' in options:
             self._AUTH_TYPE = "oidc"
             try:
