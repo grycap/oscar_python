@@ -13,17 +13,16 @@
 # limitations under the License. 
 
 import base64
-import json
 import os
 import requests
-_DEFAULT_TIMEOUT = 30
+import liboidcagent as agent
+_DEFAULT_TIMEOUT = 60
 
 """ Generic http request """
 def make_request(c , path, method, **kwargs):
 
     if "timeout" in kwargs.keys() and kwargs["timeout"]: 
         timeout = kwargs["timeout"]
-        print("timeout set to: ", timeout)
     else: 
         timeout = _DEFAULT_TIMEOUT
 
@@ -43,11 +42,15 @@ def make_request(c , path, method, **kwargs):
     result.raise_for_status()
     return result
 
-""" Function to generate headers with basic authentication """
+""" Function to generate headers with basic authentication or OIDC """
 def get_headers(c):
-    usr_pass_as_bytes = bytes(c.user+":"+c.password,"utf-8")
-    usr_pass_base_64 = base64.b64encode(usr_pass_as_bytes).decode("utf-8")
-    return {"Authorization": "Basic "+ usr_pass_base_64}
+    if c._AUTH_TYPE == "basicauth":
+        usr_pass_as_bytes = bytes(c.user+":"+c.password,"utf-8")
+        usr_pass_base_64 = base64.b64encode(usr_pass_as_bytes).decode("utf-8")
+        return {"Authorization": "Basic "+ usr_pass_base_64}
+    if c._AUTH_TYPE == "oidc":
+        token = agent.get_access_token(c.shortname)
+        return get_headers_with_token(token)
 
 """ Function to generate headers with token auth """
 def get_headers_with_token(token):
