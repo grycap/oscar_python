@@ -64,7 +64,7 @@ class Client:
         elif 'shortname' in options:
             self._AUTH_TYPE = "oidc"
             try:
-                agent.get_access_token(self.shortname)
+                agent.get_access_token(options['shortname'])
             except agent.OidcAgentError as e:
                 print("ERROR oidc-agent: {}".format(e))
         else:
