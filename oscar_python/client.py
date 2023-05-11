@@ -42,14 +42,14 @@ class Client:
             self.oidc_client(options)
 
     def basic_auth_client(self, options):
-        self.id = self.id
+        self.id = options['cluster_id']
         self.endpoint = options['endpoint']
         self.user = options['user']
         self.password = options['password']
         self.ssl = bool(options['ssl'])
 
     def oidc_client(self, options):
-        self.id = self.id
+        self.id = options['cluster_id']
         self.endpoint = options['endpoint']
         self.shortname = options['shortname']
         self.ssl = bool(options['ssl'])
@@ -57,14 +57,10 @@ class Client:
     def set_auth_type(self, options):
         if 'user' in options:
             self._AUTH_TYPE = "basicauth"
-            try:
-                self.get_cluster_info()
-            except:
-               print("")
         elif 'shortname' in options:
             self._AUTH_TYPE = "oidc"
             try:
-                agent.get_access_token(self.shortname)
+                agent.get_access_token(options['shortname'])
             except agent.OidcAgentError as e:
                 print("ERROR oidc-agent: {}".format(e))
         else:
