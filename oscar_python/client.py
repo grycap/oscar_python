@@ -42,14 +42,14 @@ class Client:
             self.oidc_client(options)
 
     def basic_auth_client(self, options):
-        self.id = self.id
+        self.id = options['cluster_id']
         self.endpoint = options['endpoint']
         self.user = options['user']
         self.password = options['password']
         self.ssl = bool(options['ssl'])
 
     def oidc_client(self, options):
-        self.id = self.id
+        self.id = options['cluster_id']
         self.endpoint = options['endpoint']
         self.shortname = options['shortname']
         self.ssl = bool(options['ssl'])
