@@ -13,9 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License. 
 
-import os
 import json
 import yaml
+import liboidcagent as agent
 import oscar_python._utils as utils
 from oscar_python.storage import Storage
 
@@ -26,25 +26,49 @@ _LOGS_PATH = "/system/logs"
 _RUN_PATH = "/run"
 #_JOB_PATH = "/job"
 
-_MINIO = "minio"
-_S3 = "s3"
-_ONE_DATA = "onedata"
-_WEBDAV = "webdav"
 
 _GET = "get"
 _POST = "post"
 _PUT = "put"
 _DELETE = "delete"
-_DEFAULT_TIMEOUT = 30
 
 class Client:
     #Cluster info 
-    def __init__(self, id, endpoint, user, password, ssl) -> None:
-        self.id = id
-        self.endpoint = endpoint
-        self.user = user
-        self.password = password
-        self.ssl = ssl
+    def __init__(self, options) -> None:
+        self.set_auth_type(options)
+        if self._AUTH_TYPE == 'basicauth':
+            self.basic_auth_client(options)
+        if self._AUTH_TYPE == 'oidc':
+            self.oidc_client(options)
+
+    def basic_auth_client(self, options):
+        self.id = self.id
+        self.endpoint = options['endpoint']
+        self.user = options['user']
+        self.password = options['password']
+        self.ssl = bool(options['ssl'])
+
+    def oidc_client(self, options):
+        self.id = self.id
+        self.endpoint = options['endpoint']
+        self.shortname = options['shortname']
+        self.ssl = bool(options['ssl'])
+
+    def set_auth_type(self, options):
+        if 'user' in options:
+            self._AUTH_TYPE = "basicauth"
+            try:
+                self.get_cluster_info()
+            except:
+               print("")
+        elif 'shortname' in options:
+            self._AUTH_TYPE = "oidc"
+            try:
+                agent.get_access_token(self.shortname)
+            except agent.OidcAgentError as e:
+                print("ERROR oidc-agent: {}".format(e))
+        else:
+            raise ValueError("Unrecognized authentication credentials in options")
 
     """ Creates a generic storage client to interact with the storage providers 
     defined on a specific service of the refered OSCAR cluster """
@@ -123,7 +147,7 @@ class Client:
             send_data = utils.encode_input(exec_input)
 
             if "timeout" in kwargs.keys() and kwargs["timeout"]:
-                response = utils.make_request(self, _RUN_PATH+"/"+name, _POST, data=send_data, token=token, timeout=kwargs["timeout"])
+                response = utils._make_request(self, _RUN_PATH+"/"+name, _POST, data=send_data, token=token, timeout=kwargs["timeout"])
             else:
                 response = utils.make_request(self, _RUN_PATH+"/"+name, _POST, data=send_data, token=token)
             
