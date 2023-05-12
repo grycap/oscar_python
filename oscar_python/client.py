@@ -72,7 +72,7 @@ class Client:
             except agent.OidcAgentError as e:
                 print("ERROR oidc-agent: {}".format(e))
         elif 'oidc_token' in options:
-            self._AUTH_TYPE == "oidc"
+            self._AUTH_TYPE = "oidc"
         else:
             raise ValueError("Unrecognized authentication credentials in options")
 
