@@ -1,7 +1,5 @@
 ## Python OSCAR client
 
- <!-- TODO CAMBIAR DEFINICIÓN CLIENTE A -> Client(options) -->
-
 [![Build](https://github.com/grycap/oscar_python/actions/workflows/main.yaml/badge.svg)](https://github.com/grycap/oscar_python/actions/workflows/main.yaml)
 ![PyPI](https://img.shields.io/pypi/v/oscar_python)
 
