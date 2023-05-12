@@ -48,9 +48,11 @@ def get_headers(c):
         usr_pass_as_bytes = bytes(c.user+":"+c.password,"utf-8")
         usr_pass_base_64 = base64.b64encode(usr_pass_as_bytes).decode("utf-8")
         return {"Authorization": "Basic "+ usr_pass_base_64}
-    if c._AUTH_TYPE == "oidc":
+    if c._AUTH_TYPE == "oidc-agent":
         token = agent.get_access_token(c.shortname)
         return get_headers_with_token(token)
+    if c._AUTH_TYPE == "oidc":
+        return get_headers_with_token(c.oidc_token)
 
 """ Function to generate headers with token auth """
 def get_headers_with_token(token):
