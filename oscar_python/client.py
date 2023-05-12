@@ -16,7 +16,8 @@
 import json
 import yaml
 import liboidcagent as agent
-import oscar_python._utils as utils
+#import oscar_python._utils as utils
+import _utils as utils
 from oscar_python.storage import Storage
 
 _INFO_PATH = "/system/info"
@@ -38,6 +39,8 @@ class Client:
         self.set_auth_type(options)
         if self._AUTH_TYPE == 'basicauth':
             self.basic_auth_client(options)
+        if self._AUTH_TYPE == 'oidc-agent':
+            self.oidc_agent_client(options)
         if self._AUTH_TYPE == 'oidc':
             self.oidc_client(options)
 
@@ -48,21 +51,29 @@ class Client:
         self.password = options['password']
         self.ssl = bool(options['ssl'])
 
-    def oidc_client(self, options):
+    def oidc_agent_client(self, options):
         self.id = options['cluster_id']
         self.endpoint = options['endpoint']
         self.shortname = options['shortname']
+        self.ssl = bool(options['ssl'])
+    
+    def oidc_client(self, options):
+        self.id = options['cluster_id']
+        self.endpoint = options['endpoint']
+        self.oidc_token = options['oidc_token']
         self.ssl = bool(options['ssl'])
 
     def set_auth_type(self, options):
         if 'user' in options:
             self._AUTH_TYPE = "basicauth"
         elif 'shortname' in options:
-            self._AUTH_TYPE = "oidc"
+            self._AUTH_TYPE = "oidc-agent"
             try:
                 agent.get_access_token(options['shortname'])
             except agent.OidcAgentError as e:
                 print("ERROR oidc-agent: {}".format(e))
+        elif 'oidc_token' in options:
+            self._AUTH_TYPE == "oidc"
         else:
             raise ValueError("Unrecognized authentication credentials in options")
 
