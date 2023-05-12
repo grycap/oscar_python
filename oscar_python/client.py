@@ -16,8 +16,7 @@
 import json
 import yaml
 import liboidcagent as agent
-#import oscar_python._utils as utils
-import _utils as utils
+import oscar_python._utils as utils
 from oscar_python.storage import Storage
 
 _INFO_PATH = "/system/info"
