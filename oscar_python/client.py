@@ -14,6 +14,7 @@
 # limitations under the License. 
 
 import json
+import os
 import yaml
 import liboidcagent as agent
 import oscar_python._utils as utils
@@ -99,44 +100,67 @@ class Client:
     def get_service(self, name):
         return utils.make_request(self, _SVC_PATH+"/"+name, _GET)
 
-    def _apply_service(self, fdl_path, method):
+    def _check_fdl_definition(self, fdl_path):
         with open(fdl_path, "r") as read_fdl:
             fdl = self._parse_FDL_yaml(read_fdl)
         # Read FDL file and check correct format
         if fdl != ValueError:
-            for element in fdl["functions"]["oscar"]:
-                try:
-                    svc = element[self.id]
-                except KeyError as err:
-                    raise("FDL clusterID does not match current clusterID: {0}".format(err))
-                # Check if service already exists when the function is called from create_service
-                if method == _POST:
-                    svc_exists = utils.make_request(self, _SVC_PATH+"/"+svc["name"], _GET, handle=False)
-                    if svc_exists.status_code == 200:
-                        raise ValueError("A service with name '{0}' is already present on the cluster".format(svc["name"]))
-                try:
-                    with open(svc["script"]) as s:
-                        svc["script"] = s.read()
-                except IOError as err:
-                    raise("Couldn't read script")
+            try:
+                for element in fdl["functions"]["oscar"]:
+                    try:
+                        svc = element[self.id]
+                    except KeyError as err:
+                        raise("FDL clusterID does not match current clusterID: {0}".format(err))
+                    try:
+                        with open(svc["script"]) as s:
+                            svc["script"] = s.read()
+                    except IOError as err:
+                        raise("Couldn't read script")
+                    
+                    # cpu parameter has to be string on the request
+                    if type(svc["cpu"]) is int or type(svc["cpu"]) is float: svc["cpu"]= str(svc["cpu"])
 
-                # cpu parameter has to be string on the request
-                if type(svc["cpu"]) is int or type(svc["cpu"]) is float: svc["cpu"]= str(svc["cpu"])
-                utils.make_request(self, _SVC_PATH, method, data=json.dumps(svc))
+            except ValueError as err:
+                print(err)
+                raise
         else:
             raise ValueError("Bad yaml format: {0}".format(fdl))
-
-    """ Create a service on the current cluster from a FDL file """
-    def create_service(self, fdl_path):
-        return self._apply_service(fdl_path, _POST)
-
-    """ Update a specific service """
-    def update_service(self, name, fdl_path):
+        return svc
+        
+    """ Make the request to create a new service """
+    def _apply_service(self, svc, method):
+        # Check if service already exists when the function is called from create_service
+        if method == _POST:
+            svc_exists = utils.make_request(self, _SVC_PATH+"/"+svc["name"], _GET, handle=False)
+            if svc_exists.status_code == 200:
+                raise ValueError("A service with name '{0}' is already present on the cluster".format(svc["name"]))
+        utils.make_request(self, _SVC_PATH, method, data=json.dumps(svc))
+    
+    """ Create a service on the current cluster from a FDL file or a JSON definition """
+    def create_service(self, service_definition):
+        if type(service_definition) is dict:
+            return self._apply_service(service_definition, _POST)
+        if os.path.isfile(service_definition):
+            try:
+               service = self._check_fdl_definition(service_definition)
+            except Exception:
+                raise
+            return self._apply_service(service, _POST)
+        
+    """ Update a specific service from a FDL file or a JSON definition """
+    def update_service(self, name, new_service):
         # Check if service exists before update
-        svc = utils.make_request(self, _SVC_PATH+"/"+svc["name"], _GET, handle=False)
+        svc = utils.make_request(self, _SVC_PATH+"/"+name, _GET, handle=False)
         if svc.status_code != 200:
             raise ValueError("The service {0} is not present on the cluster".format(name))
-        return self._apply_service(fdl_path, _PUT)
+        if type(new_service) is dict:
+            return self._apply_service(new_service, _PUT)
+        if os.path.isfile(new_service):
+            try:
+               service = self._check_fdl_definition(new_service)
+            except Exception:
+                raise
+            return self._apply_service(service, _PUT)
 
     """ Remove a specific service """
     def remove_service(self, name):
@@ -153,7 +177,7 @@ class Client:
             send_data = utils.encode_input(exec_input)
 
             if "timeout" in kwargs.keys() and kwargs["timeout"]:
-                response = utils._make_request(self, _RUN_PATH+"/"+name, _POST, data=send_data, token=token, timeout=kwargs["timeout"])
+                response = utils.make_request(self, _RUN_PATH+"/"+name, _POST, data=send_data, token=token, timeout=kwargs["timeout"])
             else:
                 response = utils.make_request(self, _RUN_PATH+"/"+name, _POST, data=send_data, token=token)
             
