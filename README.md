@@ -135,13 +135,13 @@ services = client.list_services() # returns an http response or an HTTPError
 **create_service**
 ``` python
 # create a service 
-err = client.create_service("path_to_fdl") # returns nothing if the service is created or an error if something goes wrong
+err = client.create_service("path_to_fdl" | "JSON_definition") # returns nothing if the service is created or an error if something goes wrong
 ```
 
 **update_service**
 ``` python
 # update a service 
-err = client.update_service("service_name","path_to_fdl") # returns nothing if the service is created or an error if something goes wrong
+err = client.update_service("service_name","path_to_fdl" | "JSON_definition") # returns nothing if the service is created or an error if something goes wrong
 ```
 
 **remove_service**
