@@ -8,12 +8,52 @@ This package provides a client to interact with OSCAR (https://oscar.grycap.net)
 ### Contents
 - [Python OSCAR client](#python-oscar-client)
   - [Contents](#contents)
+  - [Client](#client)
+    - [Initialize a client with basic authentication](#initialize-a-client-with-basic-authentication)
+    - [Initialize a client OIDC authentication](#initialize-a-client-oidc-authentication)
   - [Sample usage](#sample-usage)
   - [Client methods](#client-methods)
     - [Cluster methods](#cluster-methods)
     - [Service methods](#service-methods)
     - [Logs methods](#logs-methods)
     - [Storage usage](#storage-usage)
+
+### Client
+
+#### Initialize a client with basic authentication
+``` python
+  options_basic_auth = {'cluster_id':'cluster-id',
+                'endpoint':'https://cluster-endpoint',
+                'user':'username',
+                'password':'password',
+                'ssl':'True'}
+
+  client = Client(options = options_basic_auth)
+```
+#### Initialize a client OIDC authentication
+
+If you want to use OIDC tokens to authenticate with EGI Check-In, you can use the [OIDC Agent](https://indigo-dc.gitbook.io/oidc-agent/) to create an account configuration for the EGI issuer (https://aai.egi.eu/auth/realms/egi/) and then initialize the client specifying the `shortname` of your account like follows.
+
+``` python
+  options_oidc_auth = {'cluster_id':'cluster-id',
+                'endpoint':'https://cluster-endpoint',
+                'shortname':'oidc-agent-shortname',
+                'ssl':'True'}
+                
+  client = Client(options = options_oidc_auth)
+```
+
+If you already have a valid token, you can use the parameter `oidc_token` instead.
+
+``` python
+  options_oidc_auth = {'cluster_id':'cluster-id',
+                'endpoint':'https://cluster-endpoint',
+                'oidc_token':'token',
+                'ssl':'True'}
+                
+  client = Client(options = options_oidc_auth)
+```
+An example of using a generated token is if you want to use EGI Notebooks. Since you can't use oidc-agent on the Notebook, you can make use of the generated token that EGI provides on path `/var/run/secrets/egi.eu/access_token`.
 
 ### Sample usage
 
@@ -22,7 +62,13 @@ This package provides a client to interact with OSCAR (https://oscar.grycap.net)
 ``` python
 from oscar_python.client import Client
 
-client = Client("cluster-id","https://cluster-endpoint", "username", "password", True)
+options_basic_auth = {'cluster_id':'cluster-id',
+              'endpoint':'https://cluster-endpoint',
+              'user':'username',
+              'password':'password',
+              'ssl':'True'}
+
+client = Client(options = options)
 
 # get the cluster information
 try:
@@ -37,7 +83,13 @@ except Exception as err:
 ``` python
 from oscar_python.client import Client
 
-client = Client("cluster-id","https://cluster-endpoint", "username", "password", True)
+options_basic_auth = {'cluster_id':'cluster-id',
+              'endpoint':'https://cluster-endpoint',
+              'user':'username',
+              'password':'password',
+              'ssl':'True'}
+
+client = Client(options = options)
 
 try:
   client.create_service("/absolute_path/cowsay.yaml")
@@ -83,13 +135,13 @@ services = client.list_services() # returns an http response or an HTTPError
 **create_service**
 ``` python
 # create a service 
-err = client.create_service("path_to_fdl") # returns nothing if the service is created or an error if something goes wrong
+err = client.create_service("path_to_fdl" | "JSON_definition") # returns nothing if the service is created or an error if something goes wrong
 ```
 
 **update_service**
 ``` python
 # update a service 
-err = client.update_service("service_name","path_to_fdl") # returns nothing if the service is created or an error if something goes wrong
+err = client.update_service("service_name","path_to_fdl" | "JSON_definition") # returns nothing if the service is created or an error if something goes wrong
 ```
 
 **remove_service**
