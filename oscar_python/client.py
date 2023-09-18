@@ -18,6 +18,7 @@ import os
 import yaml
 import liboidcagent as agent
 import oscar_python._utils as utils
+from default_client import DefaultClient
 from oscar_python.storage import Storage
 
 _INFO_PATH = "/system/info"
@@ -33,7 +34,7 @@ _POST = "post"
 _PUT = "put"
 _DELETE = "delete"
 
-class Client:
+class Client(DefaultClient):
     #Cluster info 
     def __init__(self, options) -> None:
         self.set_auth_type(options)
@@ -134,7 +135,7 @@ class Client:
             svc_exists = utils.make_request(self, _SVC_PATH+"/"+svc["name"], _GET, handle=False)
             if svc_exists.status_code == 200:
                 raise ValueError("A service with name '{0}' is already present on the cluster".format(svc["name"]))
-        utils.make_request(self, _SVC_PATH, method, data=json.dumps(svc))
+        return utils.make_request(self, _SVC_PATH, method, data=json.dumps(svc))
     
     """ Create a service on the current cluster from a FDL file or a JSON definition """
     def create_service(self, service_definition):
@@ -165,33 +166,6 @@ class Client:
     """ Remove a specific service """
     def remove_service(self, name):
         return utils.make_request(self, _SVC_PATH+"/"+name, _DELETE)
-
-    """ Run a synchronous execution. 
-        If an output is provided the result is decoded onto the file.
-        In both cases the function returns the HTTP response."""
-    def run_service(self, name, **kwargs):
-        if "input" in kwargs.keys() and kwargs["input"]:
-            exec_input = kwargs["input"]
-            token = self._get_token(name) 
-            
-            send_data = utils.encode_input(exec_input)
-
-            if "timeout" in kwargs.keys() and kwargs["timeout"]:
-                response = utils.make_request(self, _RUN_PATH+"/"+name, _POST, data=send_data, token=token, timeout=kwargs["timeout"])
-            else:
-                response = utils.make_request(self, _RUN_PATH+"/"+name, _POST, data=send_data, token=token)
-            
-            if "output" in kwargs.keys() and kwargs["output"]:
-                utils.decode_output(response.text, kwargs["output"])
-            return response
-        
-        return utils.make_request(self, _RUN_PATH+"/"+name, _POST, token=token)
-    
-    """ Run an asynchronous execution (unable at the moment). """
-    #TODO
-    """ def _run_job(self, name, input_path =""):
-            pass 
-    """
 
     def _get_token(self, svc):
         service = utils.make_request(self, _SVC_PATH+"/"+svc, _GET)
