@@ -21,13 +21,15 @@ _DEFAULT_TIMEOUT = 60
 """ Generic http request """
 def make_request(c , path, method, **kwargs):
 
+    headers = get_headers(c)  
+
     if "timeout" in kwargs.keys() and kwargs["timeout"]: 
         timeout = kwargs["timeout"]
     else: 
         timeout = _DEFAULT_TIMEOUT
 
     url = c.endpoint+path
-    headers = get_headers(c)  
+    
     if method in ["post", "put"]:
         if "token" in kwargs.keys() and kwargs["token"]: 
             headers = get_headers_with_token(kwargs["token"])
