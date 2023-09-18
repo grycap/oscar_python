@@ -18,7 +18,7 @@ import os
 import yaml
 import liboidcagent as agent
 import oscar_python._utils as utils
-from default_client import DefaultClient
+from oscar_python.default_client import DefaultClient
 from oscar_python.storage import Storage
 
 _INFO_PATH = "/system/info"

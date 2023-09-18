@@ -1,4 +1,4 @@
-from default_client import DefaultClient
+from oscar_python.default_client import DefaultClient
 
 class AnonymousClient(DefaultClient):
     #Cluster info 
