@@ -39,7 +39,8 @@ setup(name='oscar_python',
           'boto3',
           'setuptools >= 40.8.0',
           'pyyaml',
-          'aiohttp'
+          'aiohttp',
+          'liboidcagent',
       ],
       classifiers=[
           'Programming Language :: Python :: 3',
