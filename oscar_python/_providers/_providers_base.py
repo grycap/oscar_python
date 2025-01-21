@@ -10,9 +10,10 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License. 
+# limitations under the License.
 
 import abc
+
 
 class StorageProvider(abc.ABC):
     @abc.abstractmethod
@@ -22,7 +23,7 @@ class StorageProvider(abc.ABC):
     @abc.abstractmethod
     def upload_file(self, local_path, remote_path):
         """Generic method to be implemented by all the storage providers."""
-    
+
     @abc.abstractmethod
     def list_files_from_path(self, path):
         """Generic method to be implemented by all the storage providers."""

@@ -10,15 +10,16 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License. 
+# limitations under the License.
 
 import boto3
 from oscar_python._providers._s3 import S3
 
 _DEFAULT_MINIO_ENDPOINT = 'http://minio-service.minio:9000'
 
+
 class Minio(S3):
-   
+
     def _get_client(self, c):
         """Return Minio client with user configuration."""
         if c["endpoint"] == '':
