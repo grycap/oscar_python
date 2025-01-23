@@ -145,6 +145,7 @@ class Client(DefaultClient):
         if os.path.isfile(service_definition):
             service = self._check_fdl_definition(service_definition)
             return self._apply_service(service, _POST)
+        raise ValueError("Service definition must be a dictionary or a file path")
 
     """ Update a specific service from a FDL file or a JSON definition """
     def update_service(self, name, new_service):
