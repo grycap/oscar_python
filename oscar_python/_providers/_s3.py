@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from aiohttp import ClientError
-import logging
 import boto3
 from oscar_python._providers._providers_base import StorageProvider
 
@@ -64,6 +63,7 @@ class S3(StorageProvider):
         with open(local_path, 'rb') as data:
             try:
                 self.client.upload_fileobj(data, bucket_name, file_key + "/" + file_name)
+                return True
             except ClientError as err:
                 print("Error uploading file: ", err)
                 return False
@@ -76,6 +76,7 @@ class S3(StorageProvider):
         with open(file_path, 'wb') as data:
             try:
                 self.client.download_fileobj(bucket_name, file_key, data)
+                return True
             except ClientError as err:
                 print("Error downloading file: ", err)
                 return False

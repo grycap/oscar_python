@@ -10,11 +10,12 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License. 
+# limitations under the License.
 
 from oscar_python._providers._providers_base import StorageProvider
 from webdav3.client import Client
 from webdav3.exceptions import WebDavException
+
 
 class WebDav(StorageProvider):
     def __init__(self, credentials) -> None:
@@ -26,9 +27,9 @@ class WebDav(StorageProvider):
         if 'https://' not in hostname:
             hostname = 'https://'+hostname
         options = {
-        'webdav_hostname': hostname,
-        'webdav_login':    c["login"],
-        'webdav_password': c["password"]
+            'webdav_hostname': hostname,
+            'webdav_login':    c["login"],
+            'webdav_password': c["password"]
         }
         return Client(options=options)
 
@@ -45,13 +46,12 @@ class WebDav(StorageProvider):
         except WebDavException as exception:
             print("error uploading file to path '{0}': {1}".format(remote_path+"/"+file_name, exception))
 
-    
     def download_file(self, local_path, remote_path):
         file_name = remote_path.split('/')[-1]
         try:
             self.client.download_sync(remote_path, local_path+"/"+file_name)
         except WebDavException as exception:
             print("error downloading file from path '{0}': {1}".format(remote_path, exception))
-    
+
     def list_files_from_path(self, path):
         return self.client.list(path)

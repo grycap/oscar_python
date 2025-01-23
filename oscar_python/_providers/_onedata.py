@@ -10,29 +10,30 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License. 
+# limitations under the License.
 
 from oscar_python._providers._providers_base import StorageProvider
 import requests
 import json
 
-#TODO fix error returns
+
+# TODO fix error returns
 class Onedata(StorageProvider):
-    
+
     _CDMI_PATH = '/cdmi'
     _CDMI_VERSION_HEADER = {'X-CDMI-Specification-Version': '1.1.1'}
 
     def __init__(self, credentials) -> None:
         super().__init__()
         self._get_client(credentials)
-    
+
     def _get_client(self, c):
         self.oneprovider_space = c["space"]
         self.oneprovider_host = c["oneprovider_host"]
         self.headers = {'X-Auth-Token': c["token"]}
         self.url = (f'https://{self.oneprovider_host}{self._CDMI_PATH}/'
                     f'{self.oneprovider_space}/')
-    
+
     def upload_file(self, local_path, remote_path):
         file_name = local_path.split('/')[-1]
         if not self._folder_exists(remote_path):
@@ -57,12 +58,13 @@ class Onedata(StorageProvider):
         file_name = remote_path.split('/')[-1]
         url = self.url+remote_path
         res = requests.get(url=url, headers=self.headers)
-        if res.status_code == 200: print("Saving file to {0}/{1}".format(local_path, file_name))
+        if res.status_code == 200:
+            print("Saving file to {0}/{1}".format(local_path, file_name))
         self._save_file(local_path+"/"+file_name, res.content, mode='wb')
-    
+
     def list_files_from_path(self, path):
         headers = {**self._CDMI_VERSION_HEADER, **self.headers}
-        return requests.get(url = self.url+path+"/", headers=headers)
+        return requests.get(url=self.url+path+"/", headers=headers)
 
     def _save_file(self, path, content, mode='w'):
         with open(path, mode) as fwc:
@@ -72,12 +74,13 @@ class Onedata(StorageProvider):
 
     def _folder_exists(self, folder_name):
         headers = {**self._CDMI_VERSION_HEADER, **self.headers}
-        response = requests.get(url = self.url+folder_name+"/", headers=headers)
+        response = requests.get(url=self.url+folder_name+"/", headers=headers)
         if response.status_code == 200:
             return True
         return False
-    
+
     def _create_folder(self, folder_name):
-        response = requests.put(url = self.url+folder_name+"/", headers=self.headers)
-        if response.status_code != 201: 
-            return False
+        response = requests.put(url=self.url+folder_name+"/", headers=self.headers)
+        if response.status_code == 201:
+            return True
+        return False

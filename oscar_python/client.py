@@ -143,10 +143,7 @@ class Client(DefaultClient):
         if type(service_definition) is dict:
             return self._apply_service(service_definition, _POST)
         if os.path.isfile(service_definition):
-            try:
-                service = self._check_fdl_definition(service_definition)
-            except Exception:
-                raise
+            service = self._check_fdl_definition(service_definition)
             return self._apply_service(service, _POST)
 
     """ Update a specific service from a FDL file or a JSON definition """
