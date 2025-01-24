@@ -11,7 +11,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License. 
+# limitations under the License.
 
 import json
 import os
@@ -26,7 +26,7 @@ _CONFIG_PATH = "/system/config"
 _SVC_PATH = "/system/services"
 _LOGS_PATH = "/system/logs"
 _RUN_PATH = "/run"
-#_JOB_PATH = "/job"
+# _JOB_PATH = "/job"
 
 
 _GET = "get"
@@ -34,8 +34,9 @@ _POST = "post"
 _PUT = "put"
 _DELETE = "delete"
 
+
 class Client(DefaultClient):
-    #Cluster info 
+    # Cluster info
     def __init__(self, options) -> None:
         self.set_auth_type(options)
         if self._AUTH_TYPE == 'basicauth':
@@ -57,7 +58,7 @@ class Client(DefaultClient):
         self.endpoint = options['endpoint']
         self.shortname = options['shortname']
         self.ssl = bool(options['ssl'])
-    
+
     def oidc_client(self, options):
         self.id = options['cluster_id']
         self.endpoint = options['endpoint']
@@ -78,7 +79,7 @@ class Client(DefaultClient):
         else:
             raise ValueError("Unrecognized authentication credentials in options")
 
-    """ Creates a generic storage client to interact with the storage providers 
+    """ Creates a generic storage client to interact with the storage providers
     defined on a specific service of the refered OSCAR cluster """
     def create_storage_client(self, svc):
         return Storage(
@@ -96,7 +97,7 @@ class Client(DefaultClient):
     """ List all services from the current cluster """
     def list_services(self):
         return utils.make_request(self, _SVC_PATH, _GET)
-    
+
     """ Retreive a specific service """
     def get_service(self, name):
         return utils.make_request(self, _SVC_PATH+"/"+name, _GET)
@@ -111,15 +112,15 @@ class Client(DefaultClient):
                     try:
                         svc = element[self.id]
                     except KeyError as err:
-                        raise("FDL clusterID does not match current clusterID: {0}".format(err))
+                        raise Exception("FDL clusterID does not match current clusterID: {0}".format(err))
                     try:
                         with open(svc["script"]) as s:
                             svc["script"] = s.read()
-                    except IOError as err:
-                        raise("Couldn't read script")
-                    
+                    except IOError:
+                        raise Exception("Couldn't read script")
+
                     # cpu parameter has to be string on the request
-                    if type(svc["cpu"]) is int or type(svc["cpu"]) is float: svc["cpu"]= str(svc["cpu"])
+                    if type(svc["cpu"]) is int or type(svc["cpu"]) is float: svc["cpu"] = str(svc["cpu"])
 
             except ValueError as err:
                 print(err)
@@ -127,7 +128,7 @@ class Client(DefaultClient):
         else:
             raise ValueError("Bad yaml format: {0}".format(fdl))
         return svc
-        
+
     """ Make the request to create a new service """
     def _apply_service(self, svc, method):
         # Check if service already exists when the function is called from create_service
@@ -136,18 +137,16 @@ class Client(DefaultClient):
             if svc_exists.status_code == 200:
                 raise ValueError("A service with name '{0}' is already present on the cluster".format(svc["name"]))
         return utils.make_request(self, _SVC_PATH, method, data=json.dumps(svc))
-    
+
     """ Create a service on the current cluster from a FDL file or a JSON definition """
     def create_service(self, service_definition):
         if type(service_definition) is dict:
             return self._apply_service(service_definition, _POST)
         if os.path.isfile(service_definition):
-            try:
-               service = self._check_fdl_definition(service_definition)
-            except Exception:
-                raise
+            service = self._check_fdl_definition(service_definition)
             return self._apply_service(service, _POST)
-        
+        raise ValueError("Service definition must be a dictionary or a file path")
+
     """ Update a specific service from a FDL file or a JSON definition """
     def update_service(self, name, new_service):
         # Check if service exists before update
@@ -158,7 +157,7 @@ class Client(DefaultClient):
             return self._apply_service(new_service, _PUT)
         if os.path.isfile(new_service):
             try:
-               service = self._check_fdl_definition(new_service)
+                service = self._check_fdl_definition(new_service)
             except Exception:
                 raise
             return self._apply_service(service, _PUT)
@@ -178,11 +177,11 @@ class Client(DefaultClient):
         except ValueError as err:
             return err
         return fdl_yaml
-    
+
     """ Get logs of a service job """
     def get_job_logs(self, svc, job):
         return utils.make_request(self, _LOGS_PATH+"/"+svc+"/"+job, _GET)
-    
+
     """ List a service jobs """
     def list_jobs(self, svc):
         return utils.make_request(self, _LOGS_PATH+"/"+svc, _GET)

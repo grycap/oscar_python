@@ -1,7 +1,8 @@
 from oscar_python.default_client import DefaultClient
 
+
 class AnonymousClient(DefaultClient):
-    #Cluster info 
+    # Cluster info
     def __init__(self, options) -> None:
         self.id = options['cluster_id']
         self.endpoint = options["endpoint"]
