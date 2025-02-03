@@ -131,7 +131,8 @@ class Client(DefaultClient):
         else:
             raise ValueError("Bad yaml format: {0}".format(fdl))
         return svc
-     """ Get status of a cluster (CPU and Memory)"""
+
+    """ Get status of a cluster (CPU and Memory) """
     def get_cluster_status(self):
         return utils.make_request(self, _STATUS_PATH, _GET)
 
