@@ -26,6 +26,9 @@ _CONFIG_PATH = "/system/config"
 _SVC_PATH = "/system/services"
 _LOGS_PATH = "/system/logs"
 _RUN_PATH = "/run"
+_STATUS_PATH="/system/status"
+
+
 # _JOB_PATH = "/job"
 
 
@@ -128,6 +131,9 @@ class Client(DefaultClient):
         else:
             raise ValueError("Bad yaml format: {0}".format(fdl))
         return svc
+     """ Get status of a cluster (CPU and Memory)"""
+    def get_cluster_status(self):
+        return utils.make_request(self, _STATUS_PATH, _GET)
 
     """ Make the request to create a new service """
     def _apply_service(self, svc, method):
