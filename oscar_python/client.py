@@ -158,10 +158,7 @@ class Client(DefaultClient):
         if type(new_service) is dict:
             return self._apply_service(new_service, _PUT)
         if os.path.isfile(new_service):
-            try:
-                service = self._check_fdl_definition(new_service)
-            except Exception:
-                raise
+            service = self._check_fdl_definition(new_service)
             return self._apply_service(service, _PUT)
 
     """ Remove a specific service """
