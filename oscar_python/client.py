@@ -21,8 +21,6 @@ import oscar_python._utils as utils
 from oscar_python.default_client import DefaultClient
 from oscar_python.storage import Storage
 
-_DEFAULT_PROVIDER = "minio.default"
-
 _INFO_PATH = "/system/info"
 _CONFIG_PATH = "/system/config"
 _SVC_PATH = "/system/services"
@@ -195,15 +193,3 @@ class Client(DefaultClient):
     """ Remove all service jobs """
     def remove_all_jobs(self, svc):
         return utils.make_request(self, _LOGS_PATH+"/"+svc, _DELETE)
-
-    """ Run an asynchronous execution """
-    def run_job(self, name, input_file_path):
-        # Get svc definition to get input storage provider and path to upload the file
-        svc_resp = self.get_service(name)
-        svc_def = json.loads(svc_resp.text)
-        storage_provider = svc_def.get("input")[0]["storage_provider"]
-        remote_path = svc_def.get("input")[0]["path"]
-        remote_file = os.path.join(remote_path, os.path.basename(input_file_path))
-
-        storage_service = self.create_storage_client(name)
-        storage_service.upload_file(storage_provider, input_file_path, remote_file)

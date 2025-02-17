@@ -1,6 +1,6 @@
 import pytest
 import json
-from unittest.mock import patch, mock_open, MagicMock
+from unittest.mock import patch, mock_open
 from oscar_python.client import Client
 
 
@@ -127,16 +127,3 @@ def test_remove_service(options):
     with patch('oscar_python._utils.make_request') as mock_request:
         client.remove_service("test_service")
         mock_request.assert_called_once_with(client, "/system/services/test_service", "delete")
-
-
-def test_run_job(options):
-    client = Client(options)
-    with patch('oscar_python.storage.Storage.upload_file') as mock_upload, \
-         patch('oscar_python._utils.make_request') as mock_request:
-        mock_resp = MagicMock()
-        mock_resp.text = '{"input": [{"storage_provider": "minio.id", "path": "/input"}], \
-                           "storage_providers": {"minio": {"id": {"endpoint": "string"}}}}'
-        mock_resp.status_code = 200
-        mock_request.return_value = mock_resp
-        client.run_job("test_service", "/tmp/local")
-        mock_upload.assert_called_once_with('minio.id', '/tmp/local', '/input/local')
