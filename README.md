@@ -164,7 +164,7 @@ response = client.run_service("service_name", input="input", output="out.png", t
 
 ``` python
 # make an asynchronous execution 
-client.run_job("service_name", "path_to_input_file")
+response = client.run_job("service_name", "path_to_input_file") # returns a boolean: True if success False in case of error
 ```
 
 #### Logs methods
@@ -214,11 +214,11 @@ files = storage_service.list_files_from_path("storage_provider") # returns json
 **upload_file**
 ``` python
 # upload a file from a local path to a remote path 
-response = storage_service.upload_file("storage_provider", "local_path", "remote_path")
+response = storage_service.upload_file("storage_provider", "local_path", "remote_path") # returns a boolean: True if success False in case of error
 ```
 
 **download_file**
 ``` python
 # download a file from a remote path to a local path 
-response = storage_service.download_file("storage_provider", "local_path", "remote_path")
+response = storage_service.download_file("storage_provider", "local_path", "remote_path") # returns a boolean: True if success False in case of error
 ```

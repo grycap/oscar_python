@@ -73,9 +73,9 @@ class Storage:
     """ Upload file from a local path to a remote path. """
     def upload_file(self, storage_provider, local_path, remote_path):
         client = self._get_client(storage_provider)
-        client.upload_file(local_path, remote_path)
+        return client.upload_file(local_path, remote_path)
 
     """ Download file from a remote path to a local path. """
     def download_file(self, storage_provider, local_path, remote_path):
         client = self._get_client(storage_provider)
-        client.download_file(local_path, remote_path)
+        return client.download_file(local_path, remote_path)
