@@ -159,6 +159,14 @@ response = client.remove_service("service_name") # returns an http response
 response = client.run_service("service_name", input="input", output="out.png", timeout=100) # returns an http response
 ```
 
+**run_job**
+
+
+``` python
+# make an asynchronous execution 
+client.run_job("service_name", "path_to_input_file")
+```
+
 #### Logs methods
 
 **get_job_logs**
