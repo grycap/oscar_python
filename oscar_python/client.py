@@ -206,4 +206,4 @@ class Client(DefaultClient):
         remote_file = os.path.join(remote_path, os.path.basename(input_file_path))
 
         storage_service = self.create_storage_client(name)
-        return storage_service.upload_file(storage_provider, input_file_path, remote_file)
+        storage_service.upload_file(storage_provider, input_file_path, remote_file)

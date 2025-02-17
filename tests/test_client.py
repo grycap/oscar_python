@@ -133,12 +133,10 @@ def test_run_job(options):
     client = Client(options)
     with patch('oscar_python.storage.Storage.upload_file') as mock_upload, \
          patch('oscar_python._utils.make_request') as mock_request:
-        mock_upload.return_value = True
         mock_resp = MagicMock()
         mock_resp.text = '{"input": [{"storage_provider": "minio.id", "path": "/input"}], \
                            "storage_providers": {"minio": {"id": {"endpoint": "string"}}}}'
         mock_resp.status_code = 200
         mock_request.return_value = mock_resp
-        success = client.run_job("test_service", "/tmp/local")
-        assert success is True
+        client.run_job("test_service", "/tmp/local")
         mock_upload.assert_called_once_with('minio.id', '/tmp/local', '/input/local')
