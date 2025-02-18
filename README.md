@@ -157,6 +157,9 @@ response = client.remove_service("service_name") # returns an http response
 ``` python
 # make a synchronous execution 
 response = client.run_service("service_name", input="input", output="out.png", timeout=100) # returns an http response
+
+# make an asynchronous execution
+response = client.run_service("service_name", input="input", async_call=True) # returns an http response
 ```
 
 #### Logs methods
