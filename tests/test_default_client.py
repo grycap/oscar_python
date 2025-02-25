@@ -41,7 +41,7 @@ def test_run_service_with_input_no_token(mock_encode_input, mock_make_request, c
     response = client.run_service("test_service", input="test_input")
 
     mock_encode_input.assert_called_once_with("test_input")
-    mock_make_request.assert_called_once_with(client, _RUN_PATH+"/test_service", _POST, data="encoded_input", token="test_token")
+    mock_make_request.assert_called_once_with(client, _RUN_PATH+"/test_service", _POST, data="encoded_input", token="test_token", timeout=None)
     assert response == mock_response
 
 
