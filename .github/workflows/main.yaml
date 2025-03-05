@@ -1,8 +1,9 @@
-name: Build
+name: Pypi release
 
 on:
   release:
     types: [created]
+  workflow_dispatch: # Manually trigger the workflow
 
 jobs:
   pypi:
