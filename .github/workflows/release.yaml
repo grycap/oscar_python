@@ -1,0 +1,58 @@
+name: Monthly Release
+
+on:
+  schedule:
+    - cron: '0 0 1 * *' # Runs at 00:00 on the 1st of every month
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Type of version increment (patch, minor, major)'
+        required: true
+        default: 'patch'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.12'
+
+    - name: Get current version
+      id: get_version
+      run: |
+        current_version=$(python setup.py --version)
+        echo "Current version: $current_version"
+        IFS='.' read -r -a version_parts <<< "$current_version"
+        major=${version_parts[0]}
+        minor=${version_parts[1]}
+        patch=${version_parts[2]}
+        version_type="${{ github.event.inputs.version_type }}"
+        if [ "$version_type" == "major" ]; then
+          new_major=$((major + 1))
+          new_version="$new_major.0.0"
+        elif [ "$version_type" == "minor" ]; then
+          new_minor=$((minor + 1))
+          new_version="$major.$new_minor.0"
+        else
+          new_patch=$((patch + 1))
+          new_version="$major.$minor.$new_patch"
+        fi
+        echo "New version: $new_version"
+        echo "::set-output name=new_version::$new_version"
+
+    - name: Create GitHub Release
+      if: steps.get_version.outputs.new_version
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.get_version.outputs.new_version }}
+        release_name: Release ${{ steps.get_version.outputs.new_version }}
+        draft: false
+        prerelease: false
