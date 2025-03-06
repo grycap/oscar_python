@@ -12,7 +12,7 @@ on:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout
@@ -28,7 +28,17 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install setuptools wheel twine
 
+    - name: Check for changes outside .github/workflows directory
+      id: check_changes
+      run: |
+        if git diff --name-only HEAD~1 HEAD | grep -qv '^.github/workflows/'; then
+          echo "changes_detected=true" >> $GITHUB_ENV
+        else
+          echo "changes_detected=false" >> $GITHUB_ENV
+        fi
+
     - name: Get current version
+      if: env.changes_detected == 'true'
       id: get_version
       run: |
         current_version=$(python setup.py --version)
@@ -52,7 +62,7 @@ jobs:
         echo "::set-output name=new_version::$new_version"
 
     - name: Create GitHub Release
-      if: steps.get_version.outputs.new_version
+      if: env.changes_detected == 'true'
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -61,3 +71,31 @@ jobs:
         release_name: Release ${{ steps.get_version.outputs.new_version }}
         draft: false
         prerelease: false
+
+    - name: Update version.py
+      if: env.changes_detected == 'true'
+      run: |
+        echo "__version__ = '$new_version'" > oscar_python/version.py
+      env:
+        new_version: ${{ steps.get_version.outputs.new_version }}
+
+    - name: Commit version change
+      if: env.changes_detected == 'true'
+      run: |
+        git config --global user.name 'github-actions'
+        git config --global user.email 'github-actions@github.com'
+        git add oscar_python/version.py
+        git commit -m "Bump version to $new_version"
+        git push
+      env:
+        new_version: ${{ steps.get_version.outputs.new_version }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build package
+      if: env.changes_detected == 'true'
+      run: |
+        python setup.py sdist bdist_wheel
+
+    - name: Publish package to PyPI
+      if: env.changes_detected == 'true'
+      uses: pypa/gh-action-pypi-publish@release/v1
