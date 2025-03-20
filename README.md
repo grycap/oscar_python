@@ -68,6 +68,20 @@ If you have a valid refresh token (long live token), you can use the parameter `
 
 You can get a refresh token from EGI Check-In using the [Token Portal](https://aai.egi.eu/token).
 
+In case of using other OIDC provider you must provide two additional parameters `token_endpoint`
+and `scopes`:
+
+``` python
+  options_oidc_auth = {'cluster_id':'cluster-id',
+                'endpoint':'https://cluster-endpoint',
+                'refresh_token':'token',
+                'scopes': ["openid", "profile", "email"],
+                'token_endpoint': "http://issuer.com/token",
+                'ssl':'True'}
+                
+  client = Client(options = options_oidc_auth)
+```
+
 ### Sample usage
 
 - Sample code that creates a client and gets information about the cluster
