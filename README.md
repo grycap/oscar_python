@@ -55,6 +55,19 @@ If you already have a valid token, you can use the parameter `oidc_token` instea
 ```
 An example of using a generated token is if you want to use EGI Notebooks. Since you can't use oidc-agent on the Notebook, you can make use of the generated token that EGI provides on path `/var/run/secrets/egi.eu/access_token`.
 
+If you have a valid refresh token (long live token), you can use the parameter `refresh_token` instead.
+
+``` python
+  options_oidc_auth = {'cluster_id':'cluster-id',
+                'endpoint':'https://cluster-endpoint',
+                'refresh_token':'token',
+                'ssl':'True'}
+                
+  client = Client(options = options_oidc_auth)
+```
+
+You can get a refresh token from EGI Check-In using the [Token Portal](https://aai.egi.eu/token).
+
 ### Sample usage
 
 - Sample code that creates a client and gets information about the cluster
