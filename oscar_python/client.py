@@ -18,6 +18,7 @@ import os
 import yaml
 import liboidcagent as agent
 import oscar_python._utils as utils
+from oscar_python._oidc import OIDC
 from oscar_python.default_client import DefaultClient
 from oscar_python.storage import Storage
 
@@ -37,10 +38,16 @@ _POST = "post"
 _PUT = "put"
 _DELETE = "delete"
 
+# Default values for OIDC refresh token using EGI CheckIn
+_DEFAULT_SCOPES = ['openid', 'email', 'profile', 'voperson_id', 'eduperson_entitlement']
+_DEFAULT_TOKEN_ENDPOINT = 'https://aai.egi.eu/auth/realms/egi/protocol/openid-connect/token'
+
 
 class Client(DefaultClient):
     # Cluster info
     def __init__(self, options) -> None:
+        self.id = options['cluster_id']
+        self.endpoint = options['endpoint']
         self.set_auth_type(options)
         if self._AUTH_TYPE == 'basicauth':
             self.basic_auth_client(options)
@@ -50,22 +57,20 @@ class Client(DefaultClient):
             self.oidc_client(options)
 
     def basic_auth_client(self, options):
-        self.id = options['cluster_id']
-        self.endpoint = options['endpoint']
         self.user = options['user']
         self.password = options['password']
         self.ssl = bool(options['ssl'])
 
     def oidc_agent_client(self, options):
-        self.id = options['cluster_id']
-        self.endpoint = options['endpoint']
         self.shortname = options['shortname']
         self.ssl = bool(options['ssl'])
 
     def oidc_client(self, options):
-        self.id = options['cluster_id']
-        self.endpoint = options['endpoint']
-        self.oidc_token = options['oidc_token']
+        self.oidc_token = options.get('oidc_token')
+        self.refresh_token = options.get('refresh_token')
+        self.scopes = options.get('scopes', _DEFAULT_SCOPES)
+        self.token_endpoint = options.get('token_endpoint',
+                                          _DEFAULT_TOKEN_ENDPOINT)
         self.ssl = bool(options['ssl'])
 
     def set_auth_type(self, options):
@@ -77,10 +82,17 @@ class Client(DefaultClient):
                 agent.get_access_token(options['shortname'])
             except agent.OidcAgentError as e:
                 print("ERROR oidc-agent: {}".format(e))
-        elif 'oidc_token' in options:
+        elif 'oidc_token' in options or 'refresh_token' in options:
             self._AUTH_TYPE = "oidc"
         else:
             raise ValueError("Unrecognized authentication credentials in options")
+
+    def get_access_token(self):
+        if self.refresh_token and OIDC.is_access_token_expired(self.oidc_token):
+            self.oidc_token = OIDC.refresh_access_token(self.refresh_token,
+                                                        self.scopes,
+                                                        self.token_endpoint)
+        return self.oidc_token
 
     """ Creates a generic storage client to interact with the storage providers
     defined on a specific service of the refered OSCAR cluster """

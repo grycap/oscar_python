@@ -56,7 +56,7 @@ def get_headers(c):
         token = agent.get_access_token(c.shortname)
         return get_headers_with_token(token)
     if c._AUTH_TYPE == "oidc":
-        return get_headers_with_token(c.oidc_token)
+        return get_headers_with_token(c.get_access_token())
 
 
 def get_headers_with_token(token):

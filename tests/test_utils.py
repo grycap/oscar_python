@@ -29,7 +29,9 @@ def test_get_headers_with_oidc_agent():
 def test_get_headers_with_oidc():
     class MockClient:
         _AUTH_TYPE = "oidc"
-        oidc_token = "test_oidc_token"
+
+        def get_access_token(self):
+            return "test_oidc_token"
 
     c = MockClient()
     headers = utils.get_headers(c)
