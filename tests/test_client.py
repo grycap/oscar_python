@@ -44,6 +44,7 @@ def test_oidc_client(options):
     assert client.oidc_token == options['oidc_token']
     assert client.ssl == options['ssl']
 
+    del options['oidc_token']
     options['refresh_token'] = 'test_refresh_token'
     options['scopes'] = ['openid', 'profile', 'email']
     options['token_endpoint'] = 'test_token_endpoint'

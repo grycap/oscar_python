@@ -82,7 +82,7 @@ class Client(DefaultClient):
                 agent.get_access_token(options['shortname'])
             except agent.OidcAgentError as e:
                 print("ERROR oidc-agent: {}".format(e))
-        elif 'oidc_token' in options:
+        elif 'oidc_token' in options or 'refresh_token' in options:
             self._AUTH_TYPE = "oidc"
         else:
             raise ValueError("Unrecognized authentication credentials in options")
