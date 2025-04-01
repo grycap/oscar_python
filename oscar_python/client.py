@@ -89,7 +89,9 @@ class Client(DefaultClient):
 
     def get_access_token(self):
         if self.refresh_token and OIDC.is_access_token_expired(self.oidc_token):
-            self.oidc_token = OIDC.refresh_access_token(self.refresh_token)
+            self.oidc_token = OIDC.refresh_access_token(self.refresh_token,
+                                                        self.scopes,
+                                                        self.token_endpoint)
         return self.oidc_token
 
     """ Creates a generic storage client to interact with the storage providers
