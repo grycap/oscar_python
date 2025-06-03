@@ -23,20 +23,36 @@ _MINIO = "minio"
 _S3 = "s3"
 _ONE_DATA = "onedata"
 _WEBDAV = "webdav"
+
+_GET = "get"
+_CONFIG_PATH = "/system/config"
 _SVC_PATH = "/system/services"
 
 
 # TODO check returns from functions
 class Storage:
-    def __init__(self, client_obj, svc_name) -> None:
+    def __init__(self, client_obj, svc_name = None) -> None:
         self.client_obj = client_obj
-        self.svc_name = svc_name
-        self._store_providers()
+        self.storage_providers = {}
+        if svc_name != None:
+            self.svc_name = svc_name
+            self._store_provider_from_service()
+        self._store_default_minio_provider()
 
     """ Function to store all the providers of the service """
-    def _store_providers(self):
-        svc = utils.make_request(self.client_obj, _SVC_PATH + "/" + self.svc_name, "get")
+    def _store_provider_from_service(self):
+        svc = utils.make_request(self.client_obj, _SVC_PATH + "/" + self.svc_name, _GET)
         self.storage_providers = json.loads(svc.text)["storage_providers"]
+
+    """ Function to store the user credentials for the default MinIO provider """
+    def _store_default_minio_provider(self):
+        config = utils.make_request(self.client_obj, _CONFIG_PATH + "/" , _GET)
+        if _MINIO in self.storage_providers:
+            self.storage_providers[_MINIO]["default"] = json.loads(config.text)["minio_provider"]
+        else:
+            default = {"default": json.loads(config.text)["minio_provider"]}
+            self.storage_providers[_MINIO] = default
+        
 
     """ Function to retreive credentials of a specific storage provider """
     def _get_provider_creds(self, provider, provider_name):
