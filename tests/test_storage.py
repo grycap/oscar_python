@@ -11,9 +11,9 @@ def mock_client_obj():
 @pytest.fixture
 def storage(mock_client_obj):
     mock_response = MagicMock()
-    mock_response.text = '{"storage_providers": {"minio": {"default": {"access_key": "key","secret_key": "secret", "endpoint": "http://test.endpoint", "region": "us-east-1", "verify": false}}}}'
+    mock_response.text = '{"minio_provider": {"access_key": "key","secret_key": "secret", "endpoint": "http://test.endpoint", "region": "us-east-1", "verify": false}}'
     with patch('oscar_python._utils.make_request', return_value=mock_response):
-        return Storage(mock_client_obj, "test_service")
+        return Storage(mock_client_obj)
 
 
 def test_get_provider_creds(storage):

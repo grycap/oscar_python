@@ -96,11 +96,14 @@ class Client(DefaultClient):
 
     """ Creates a generic storage client to interact with the storage providers
     defined on a specific service of the refered OSCAR cluster """
-    def create_storage_client(self, svc):
-        return Storage(
-                client_obj=self,
-                svc_name=svc)
-
+    def create_storage_client(self, svc=None):
+        if svc != None:
+            return Storage(
+                client_obj=self, svc_name=svc)
+        else:
+            return Storage(
+                    client_obj=self)
+        
     """ Function to get cluster info """
     def get_cluster_info(self):
         return utils.make_request(self, _INFO_PATH, _GET)

@@ -217,11 +217,19 @@ response = client.remove_all_jobs("service_name") # returns an http response
 
 #### Storage usage
 
-You can create a storage object to operate over the different storage providers defined on a service with the method `create_storage_client` as follows:
+You can create a storage object to operate over the different storage providers defined on a service with the method `create_storage_client`. This constructor returns a storage object with methos to interact with the storage providers.
+
+The default constructor, seen as follows, will create a provider to interact with the default MinIO instance through the user's credentials. 
+
+``` python
+storage_service = client.create_storage_client() # returns a storage object
+```
+Additionally, if you need to interact with specific storage providers defined on a service, the constructor accepts a `svc` parameter where you can state the service name from which to search for additional credentials.
 
 ``` python
 storage_service = client.create_storage_client("service_name") # returns a storage object
 ```
+
 > _Note_ : The `storage_provider` parameter on the storage methods follows the format: `["storage_provider_type"].["storage_provider_name"]` where `storage_provider_type` is one of the suported storage providers (minIO, S3, Onedata or webdav) and `storage_provider_name` is the identifier _(ex: minio.default)_
 
 **list_files_from_path**
