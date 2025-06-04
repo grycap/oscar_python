@@ -1,4 +1,4 @@
-name: Monthly Release
+name: Releases workflow
 
 on:
   release:
