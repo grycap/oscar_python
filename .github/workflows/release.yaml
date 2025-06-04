@@ -1,6 +1,8 @@
 name: Monthly Release
 
 on:
+  release:
+    types: [created]
   schedule:
     - cron: '0 0 1 * *' # Runs at 00:00 on the 1st of every month
   workflow_dispatch:
