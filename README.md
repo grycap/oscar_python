@@ -238,7 +238,7 @@ This method returns a JSON with the info except for OneData, which returns an HT
 
 ``` python
 # get a list of the files of one of the service storage provider 
-files = storage_service.list_files_from_path("storage_provider") # returns json
+files = storage_service.list_files_from_path("storage_provider", "remote_path") # returns json
 ```
 
 **upload_file**
