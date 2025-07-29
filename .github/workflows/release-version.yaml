@@ -19,6 +19,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch all history for tags
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -33,11 +35,22 @@ jobs:
     - name: Check for changes inside oscar_python directory
       id: check_changes
       run: |
-        PREV_MONTH=$(date -d "last month" +%Y-%m)
-        if git log --since="$PREV_MONTH-01" --until="$(date +%Y-%m-01)" --pretty=format: --name-only | grep -q '^oscar_python/'; then
+        # Get the latest release tag
+        latest_release=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+        
+        if [ -z "$latest_release" ]; then
+          echo "No previous release found - treating as first release"
           echo "changes_detected=true" >> $GITHUB_ENV
         else
-          echo "changes_detected=false" >> $GITHUB_ENV
+          echo "Latest release: $latest_release"
+          # Check if there are changes in oscar_python directory since last release
+          if git log $latest_release..HEAD --pretty=format: --name-only | grep -q '^oscar_python/'; then
+            echo "Changes detected in oscar_python directory since $latest_release"
+            echo "changes_detected=true" >> $GITHUB_ENV
+          else
+            echo "No changes detected in oscar_python directory since $latest_release"
+            echo "changes_detected=false" >> $GITHUB_ENV
+          fi
         fi
 
     - name: Get current version
