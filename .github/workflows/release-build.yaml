@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'oscar_python/version.py'  # Only run when the version is bumped
+      - 'version.py'  # Only run when the version is bumped
 
 jobs:
   build-and-publish:
