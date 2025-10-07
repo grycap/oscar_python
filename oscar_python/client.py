@@ -205,8 +205,8 @@ class Client(DefaultClient):
         return utils.make_request(self, _LOGS_PATH+"/"+svc+"/"+job, _GET)
 
     """ List a service jobs """
-    def list_jobs(self, svc):
-        return utils.make_request(self, _LOGS_PATH+"/"+svc, _GET)
+    def list_jobs(self, svc, page=""):
+        return utils.make_request(self, _LOGS_PATH+"/"+svc+"?page="+page, _GET)
 
     """ Remove a service job """
     def remove_job(self, svc, job):
