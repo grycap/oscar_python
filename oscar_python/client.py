@@ -72,6 +72,9 @@ class Client(DefaultClient):
         self.token_endpoint = options.get('token_endpoint',
                                           _DEFAULT_TOKEN_ENDPOINT)
         self.ssl = bool(options['ssl'])
+        self.client_id = options.get('client_id')
+        if self.client_id is None:
+            self.client_id = 'token-portal'
 
     def set_auth_type(self, options):
         if 'user' in options:
@@ -91,7 +94,8 @@ class Client(DefaultClient):
         if self.refresh_token and OIDC.is_access_token_expired(self.oidc_token):
             self.oidc_token = OIDC.refresh_access_token(self.refresh_token,
                                                         self.scopes,
-                                                        self.token_endpoint)
+                                                        self.token_endpoint,
+                                                        self.client_id)
         return self.oidc_token
 
     """ Creates a generic storage client to interact with the storage providers
@@ -137,6 +141,7 @@ class Client(DefaultClient):
                         else:
                             fdl_directory = os.path.dirname(fdl_path)
                             script_path = fdl_directory + "/" + svc["script"]
+                        print(script_path)
                         with open(script_path) as s:
                             svc["script"] = s.read()
                     except IOError:

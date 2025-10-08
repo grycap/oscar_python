@@ -77,14 +77,14 @@ class OIDC(object):
             return True
 
     @staticmethod
-    def refresh_access_token(refresh_token, scopes, token_endpoint):
+    def refresh_access_token(refresh_token, scopes, token_endpoint, client_id='token-portal'):
         """
         Refresh the access token using the refresh token
         """
         data = {
             'grant_type': 'refresh_token',
             'refresh_token': refresh_token,
-            'client_id': 'token-portal',
+            'client_id': client_id,
             'scope': ' '.join(scopes)
         }
 
