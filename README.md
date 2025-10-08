@@ -77,6 +77,7 @@ and `scopes`:
                 'refresh_token':'token',
                 'scopes': ["openid", "profile", "email"],
                 'token_endpoint': "http://issuer.com/token",
+                'client_id': "your_client_id"
                 'ssl':'True'}
                 
   client = Client(options = options_oidc_auth)
@@ -201,6 +202,8 @@ logs = client.get_job_logs("service_name", "job_id") # returns an http response
 ``` python
 # get a list of jobs in a service
 log_list = client.list_jobs("service_name") # returns an http response
+# to get more jobs use the page parameter
+log_list = client.list_jobs("service_name",page="token_to_next_page") # returns an http response
 ```
 
 **remove_job**
