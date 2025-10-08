@@ -132,8 +132,11 @@ class Client(DefaultClient):
                     except KeyError as err:
                         raise Exception("FDL clusterID does not match current clusterID: {0}".format(err))
                     try:
-                        fdl_directory = os.path.dirname(fdl_path)
-                        script_path = fdl_directory + "/" + svc["script"]
+                        if os.path.isabs(svc["script"]):
+                            script_path =  svc["script"]
+                        else:
+                            fdl_directory = os.path.dirname(fdl_path)
+                            script_path = fdl_directory + "/" + svc["script"]
                         with open(script_path) as s:
                             svc["script"] = s.read()
                     except IOError:
