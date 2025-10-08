@@ -41,6 +41,7 @@ _DELETE = "delete"
 # Default values for OIDC refresh token using EGI CheckIn
 _DEFAULT_SCOPES = ['openid', 'email', 'profile', 'voperson_id', 'eduperson_entitlement']
 _DEFAULT_TOKEN_ENDPOINT = 'https://aai.egi.eu/auth/realms/egi/protocol/openid-connect/token'
+_DEFAULT_CLIENT_ID = 'token-portal'
 
 
 class Client(DefaultClient):
@@ -72,9 +73,8 @@ class Client(DefaultClient):
         self.token_endpoint = options.get('token_endpoint',
                                           _DEFAULT_TOKEN_ENDPOINT)
         self.ssl = bool(options['ssl'])
-        self.client_id = options.get('client_id')
-        if self.client_id is None:
-            self.client_id = 'token-portal'
+        self.client_id = options.get('client_id',
+                                     _DEFAULT_CLIENT_ID)
 
     def set_auth_type(self, options):
         if 'user' in options:
