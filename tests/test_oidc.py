@@ -24,7 +24,8 @@ def test_refresh_access_token():
         mock_post.return_value = mock_response
         access_token = OIDC.refresh_access_token("old_refresh_token",
                                                  ["openid", "profile", "email"],
-                                                 "http://test.com/token")
+                                                 "http://test.com/token",
+                                                 "token-portal")
 
         assert access_token == "new_access_token"
         mock_post.assert_called_once_with(

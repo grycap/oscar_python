@@ -41,6 +41,7 @@ _DELETE = "delete"
 # Default values for OIDC refresh token using EGI CheckIn
 _DEFAULT_SCOPES = ['openid', 'email', 'profile', 'voperson_id', 'eduperson_entitlement']
 _DEFAULT_TOKEN_ENDPOINT = 'https://aai.egi.eu/auth/realms/egi/protocol/openid-connect/token'
+_DEFAULT_CLIENT_ID = 'token-portal'
 
 
 class Client(DefaultClient):
@@ -72,6 +73,8 @@ class Client(DefaultClient):
         self.token_endpoint = options.get('token_endpoint',
                                           _DEFAULT_TOKEN_ENDPOINT)
         self.ssl = bool(options['ssl'])
+        self.client_id = options.get('client_id',
+                                     _DEFAULT_CLIENT_ID)
 
     def set_auth_type(self, options):
         if 'user' in options:
@@ -91,7 +94,8 @@ class Client(DefaultClient):
         if self.refresh_token and OIDC.is_access_token_expired(self.oidc_token):
             self.oidc_token = OIDC.refresh_access_token(self.refresh_token,
                                                         self.scopes,
-                                                        self.token_endpoint)
+                                                        self.token_endpoint,
+                                                        self.client_id)
         return self.oidc_token
 
     """ Creates a generic storage client to interact with the storage providers
@@ -132,9 +136,14 @@ class Client(DefaultClient):
                     except KeyError as err:
                         raise Exception("FDL clusterID does not match current clusterID: {0}".format(err))
                     try:
-                        with open(svc["script"]) as s:
+                        if os.path.isabs(svc["script"]):
+                            script_path =  svc["script"]
+                        else:
+                            fdl_directory = os.path.dirname(fdl_path)
+                            script_path = os.path.join(fdl_directory, svc['script'])
+                        with open(script_path) as s:
                             svc["script"] = s.read()
-                    except IOError:
+                    except IOError  as e:
                         raise Exception("Couldn't read script")
 
                     # cpu parameter has to be string on the request
@@ -205,8 +214,8 @@ class Client(DefaultClient):
         return utils.make_request(self, _LOGS_PATH+"/"+svc+"/"+job, _GET)
 
     """ List a service jobs """
-    def list_jobs(self, svc):
-        return utils.make_request(self, _LOGS_PATH+"/"+svc, _GET)
+    def list_jobs(self, svc, page=""):
+        return utils.make_request(self, _LOGS_PATH+"/"+svc+"?page="+page, _GET)
 
     """ Remove a service job """
     def remove_job(self, svc, job):
