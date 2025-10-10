@@ -77,7 +77,7 @@ class OIDC(object):
             return True
 
     @staticmethod
-    def refresh_access_token(refresh_token, scopes, token_endpoint, client_id):
+    def refresh_access_token(refresh_token, scopes, token_endpoint, client_id="token-portal"):
         """
         Refresh the access token using the refresh token
         """

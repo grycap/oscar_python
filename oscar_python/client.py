@@ -140,11 +140,10 @@ class Client(DefaultClient):
                             script_path =  svc["script"]
                         else:
                             fdl_directory = os.path.dirname(fdl_path)
-                            script_path = fdl_directory + "/" + svc["script"]
-                        print(script_path)
+                            script_path = os.path.join(fdl_directory, svc['script'])
                         with open(script_path) as s:
                             svc["script"] = s.read()
-                    except IOError:
+                    except IOError  as e:
                         raise Exception("Couldn't read script")
 
                     # cpu parameter has to be string on the request
