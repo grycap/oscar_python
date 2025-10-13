@@ -1,7 +1,5 @@
 ## Python OSCAR client
 
-## Python OSCAR client
-
 [![Tests](https://github.com/grycap/oscar_python/actions/workflows/tests.yaml/badge.svg?branch=main)](https://github.com/grycap/oscar_python/actions/workflows/tests.yaml)
 [![PyPI](https://img.shields.io/pypi/v/oscar-python)](https://pypi.org/project/oscar-python/)
 
