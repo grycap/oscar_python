@@ -31,5 +31,8 @@ dev = [
 Homepage = "https://github.com/grycap/oscar-python"
 Repository = "https://github.com/grycap/oscar-python"
 
+[tool.setuptools]
+packages = ["oscar_python"]
+
 [tool.setuptools_scm]
 # Automatically get version from git tags
