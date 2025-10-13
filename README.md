@@ -1,7 +1,7 @@
 ## Python OSCAR client
 
-[![Build](https://github.com/grycap/oscar_python/actions/workflows/release-build.yaml/badge.svg)](https://github.com/grycap/oscar_python/actions/workflows/release-build.yaml)
-![PyPI](https://img.shields.io/pypi/v/oscar_python)
+[![Tests](https://github.com/grycap/oscar_python/actions/workflows/tests.yaml/badge.svg?branch=main)](https://github.com/grycap/oscar_python/actions/workflows/tests.yaml)
+[![PyPI](https://img.shields.io/pypi/v/oscar-python)](https://pypi.org/project/oscar-python/)
 
 This package provides a client to interact with OSCAR (https://oscar.grycap.net) clusters and services. It is available on Pypi with the name [oscar-python](https://pypi.org/project/oscar-python/).
 
