@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=64", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "oscar-python"
+dynamic = ["version"]
+description = "Python client for OSCAR clusters"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "Apache-2.0"}
+authors = [{name = "GRyCAP - I3M - UPV"}]
+keywords = ["oscar", "faas", "serverless"]
+
+dependencies = [
+    "requests",
+    "webdavclient3>=3.14.6",
+    "boto3",
+    "pyyaml",
+    "aiohttp",
+    "liboidcagent",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+]
+
+[project.urls]
+Homepage = "https://github.com/grycap/oscar-python"
+Repository = "https://github.com/grycap/oscar-python"
+
+[tool.setuptools]
+packages = ["oscar_python"]
+
+[tool.setuptools_scm]
+# Automatically get version from git tags

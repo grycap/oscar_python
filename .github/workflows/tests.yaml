@@ -2,9 +2,9 @@ name: tests
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "devel"]
   pull_request:
-    branches: ["main"]
+    branches: ["main", "devel"]
 
 jobs:
   test:
@@ -19,7 +19,9 @@ jobs:
         python-version: '3.12'
 
     - name: Install dependencies
-      run: python -m pip install pytest pytest-cov webdavclient3 requests boto3 pyyaml aiohttp liboidcagent
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -e .[dev]
 
     - name: Run tests
       run: python -m pytest tests --cov=oscar_python
