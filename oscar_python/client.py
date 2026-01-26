@@ -198,6 +198,8 @@ class Client(DefaultClient):
         return utils.make_request(self, _SVC_PATH+"/"+name, _DELETE)
 
     def _get_token(self, svc):
+        if self._AUTH_TYPE != 'basicauth':
+            return self.get_access_token()
         service = utils.make_request(self, _SVC_PATH+"/"+svc, _GET)
         service = json.loads(service.text)
         return service["token"]
