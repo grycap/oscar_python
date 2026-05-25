@@ -27,7 +27,12 @@ _CONFIG_PATH = "/system/config"
 _SVC_PATH = "/system/services"
 _LOGS_PATH = "/system/logs"
 _RUN_PATH = "/run"
-_STATUS_PATH="/system/status"
+_STATUS_PATH = "/system/status"
+_HEALTH_PATH = "/health"
+_VOLUMES_PATH = "/system/volumes"
+_BUCKETS_PATH = "/system/buckets"
+_METRICS_PATH = "/system/metrics"
+_QUOTAS_USER_PATH = "/system/quotas/user"
 
 
 # _JOB_PATH = "/job"
@@ -101,13 +106,13 @@ class Client(DefaultClient):
     """ Creates a generic storage client to interact with the storage providers
     defined on a specific service of the refered OSCAR cluster """
     def create_storage_client(self, svc=None):
-        if svc != None:
+        if svc is not None:
             return Storage(
                 client_obj=self, svc_name=svc)
         else:
             return Storage(
                     client_obj=self)
-        
+
     """ Function to get cluster info """
     def get_cluster_info(self):
         return utils.make_request(self, _INFO_PATH, _GET)
@@ -137,17 +142,18 @@ class Client(DefaultClient):
                         raise Exception("FDL clusterID does not match current clusterID: {0}".format(err))
                     try:
                         if os.path.isabs(svc["script"]):
-                            script_path =  svc["script"]
+                            script_path = svc["script"]
                         else:
                             fdl_directory = os.path.dirname(fdl_path)
                             script_path = os.path.join(fdl_directory, svc['script'])
                         with open(script_path) as s:
                             svc["script"] = s.read()
-                    except IOError  as e:
+                    except IOError:
                         raise Exception("Couldn't read script")
 
                     # cpu parameter has to be string on the request
-                    if type(svc["cpu"]) is int or type(svc["cpu"]) is float: svc["cpu"] = str(svc["cpu"])
+                    if type(svc["cpu"]) is int or type(svc["cpu"]) is float:
+                        svc["cpu"] = str(svc["cpu"])
 
             except ValueError as err:
                 print(err)
@@ -226,3 +232,111 @@ class Client(DefaultClient):
     """ Remove all service jobs """
     def remove_all_jobs(self, svc):
         return utils.make_request(self, _LOGS_PATH+"/"+svc, _DELETE)
+
+    """ Check cluster health """
+    def health_check(self):
+        return utils.make_request(self, _HEALTH_PATH, _GET)
+
+    """ Get deployment status of a service """
+    def get_deployment_status(self, name):
+        return utils.make_request(self, _SVC_PATH + "/" + name + "/deployment", _GET)
+
+    """ Get deployment logs of a service """
+    def get_deployment_logs(self, name):
+        return utils.make_request(self, _SVC_PATH + "/" + name + "/deployment/logs", _GET)
+
+    """ List all managed volumes """
+    def list_volumes(self):
+        return utils.make_request(self, _VOLUMES_PATH, _GET)
+
+    """ Create a new managed volume """
+    def create_volume(self, name, size):
+        data = json.dumps({"name": name, "size": size})
+        return utils.make_request(self, _VOLUMES_PATH, _POST, data=data)
+
+    """ Get a specific managed volume """
+    def get_volume(self, name):
+        return utils.make_request(self, _VOLUMES_PATH + "/" + name, _GET)
+
+    """ Delete a managed volume """
+    def delete_volume(self, name):
+        return utils.make_request(self, _VOLUMES_PATH + "/" + name, _DELETE)
+
+    """ Create a bucket """
+    def create_bucket(self, name, visibility="private", allowed_users=None):
+        data = json.dumps({
+            "bucket_name": name,
+            "visibility": visibility,
+            "allowed_users": allowed_users or []
+        })
+        return utils.make_request(self, _BUCKETS_PATH, _POST, data=data)
+
+    """ Update a bucket """
+    def update_bucket(self, name, visibility, allowed_users=None):
+        data = json.dumps({
+            "bucket_name": name,
+            "visibility": visibility,
+            "allowed_users": allowed_users or []
+        })
+        return utils.make_request(self, _BUCKETS_PATH, _PUT, data=data)
+
+    """ List all buckets """
+    def list_buckets(self):
+        return utils.make_request(self, _BUCKETS_PATH, _GET)
+
+    """ Get a specific bucket """
+    def get_bucket(self, name):
+        return utils.make_request(self, _BUCKETS_PATH + "/" + name, _GET)
+
+    """ Delete a bucket """
+    def delete_bucket(self, name):
+        return utils.make_request(self, _BUCKETS_PATH + "/" + name, _DELETE)
+
+    """ Get a presigned URL for a bucket file """
+    def presign_bucket(self, name, object_key, operation="download", expires=0, content_type="", extra_headers=None):
+        path = _BUCKETS_PATH + "/" + name + "/presign"
+        data = json.dumps({
+            "object_key": object_key,
+            "operation": operation,
+            "expires": expires,
+            "content_type": content_type,
+            "extra_headers": extra_headers or {},
+        })
+        return utils.make_request(self, path, _POST, data=data)
+
+    """ Get system logs (admin only) """
+    def get_system_logs(self, timestamps=False, previous=False):
+        path = _LOGS_PATH
+        params = []
+        if timestamps:
+            params.append("timestamps=true")
+        if previous:
+            params.append("previous=true")
+        if params:
+            path += "?" + "&".join(params)
+        return utils.make_request(self, path, _GET)
+
+    """ Get metrics summary """
+    def get_metrics_summary(self):
+        return utils.make_request(self, _METRICS_PATH, _GET)
+
+    """ Get metrics breakdown """
+    def get_metrics_breakdown(self, group_by="service"):
+        return utils.make_request(self, _METRICS_PATH + "/breakdown?group_by=" + group_by, _GET)
+
+    """ Get metrics for a specific service """
+    def get_service_metrics(self, service_name):
+        return utils.make_request(self, _METRICS_PATH + "/" + service_name, _GET)
+
+    """ Get own quota """
+    def get_own_quota(self):
+        return utils.make_request(self, _QUOTAS_USER_PATH, _GET)
+
+    """ Get quota for a specific user """
+    def get_user_quota(self, user_id):
+        return utils.make_request(self, _QUOTAS_USER_PATH + "/" + user_id, _GET)
+
+    """ Update quota for a user """
+    def update_user_quota(self, user_id, cpu, memory):
+        data = json.dumps({"cpu": cpu, "memory": memory})
+        return utils.make_request(self, _QUOTAS_USER_PATH + "/" + user_id, _PUT, data=data)
