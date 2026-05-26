@@ -31,10 +31,10 @@ _SVC_PATH = "/system/services"
 
 # TODO check returns from functions
 class Storage:
-    def __init__(self, client_obj, svc_name = None) -> None:
+    def __init__(self, client_obj, svc_name=None) -> None:
         self.client_obj = client_obj
         self.storage_providers = {}
-        if svc_name != None:
+        if svc_name is not None:
             self.svc_name = svc_name
             self._store_provider_from_service()
         self._store_default_minio_provider()
@@ -46,13 +46,12 @@ class Storage:
 
     """ Function to store the user credentials for the default MinIO provider """
     def _store_default_minio_provider(self):
-        config = utils.make_request(self.client_obj, _CONFIG_PATH + "/" , _GET)
+        config = utils.make_request(self.client_obj, _CONFIG_PATH + "/", _GET)
         if _MINIO in self.storage_providers:
             self.storage_providers[_MINIO]["default"] = json.loads(config.text)["minio_provider"]
         else:
             default = {"default": json.loads(config.text)["minio_provider"]}
             self.storage_providers[_MINIO] = default
-        
 
     """ Function to retreive credentials of a specific storage provider """
     def _get_provider_creds(self, provider, provider_name):

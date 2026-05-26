@@ -59,7 +59,7 @@ class S3(StorageProvider):
         bucket_name = remote_path.split('/')[0]
         file_key = remote_path.split('/', 1)[1]
         file_name = local_path.split('/')[-1]
-        print("Uploading to bucket '{0}' with key '{1}'".format(bucket_name,file_key))
+        print("Uploading to bucket '{0}' with key '{1}'".format(bucket_name, file_key))
         with open(local_path, 'rb') as data:
             try:
                 self.client.upload_fileobj(data, bucket_name, file_key + "/" + file_name)
