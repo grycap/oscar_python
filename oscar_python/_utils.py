@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import base64
+import json
 import os
 import requests
 import liboidcagent as agent
@@ -32,14 +33,16 @@ def make_request(c, path, method, **kwargs):
     url = c.endpoint+path
 
     if method in ["post", "put"]:
-        if "token" in kwargs.keys() and kwargs["token"]: 
+        if "token" in kwargs.keys() and kwargs["token"]:
             headers = get_headers_with_token(kwargs["token"])
+        req_kwargs = {"headers": headers, "verify": c.ssl, "timeout": timeout}
         if "data" in kwargs.keys() and kwargs["data"]:
-            result = requests.request(method, url, headers=headers, verify=c.ssl, data=kwargs["data"], timeout=timeout)
+            req_kwargs["data"] = kwargs["data"]
+        result = requests.request(method, url, **req_kwargs)
     else:
         result = requests.request(method, url, headers=headers, verify=c.ssl, timeout=timeout)
 
-    if "handle" in kwargs.keys() and kwargs["handle"] == False:
+    if "handle" in kwargs.keys() and kwargs["handle"] is False:
         return result
 
     result.raise_for_status()
@@ -94,7 +97,7 @@ def decode_b64(b64_str, file_out):
     except ValueError:
         print('Error decoding output: Invalid base64 string.')
     except OSError:
-        print('Error decoding output: Failed to write decoded data to file.')   
+        print('Error decoding output: Failed to write decoded data to file.')
 
 
 def encode_input(data):
@@ -109,6 +112,21 @@ def encode_input(data):
     else:
         message_bytes = data.encode('ascii')
         return base64.b64encode(message_bytes)
+
+
+def load_config(config_path, cluster_name="default"):
+    with open(config_path) as f:
+        config = json.load(f)
+    cluster = config["clusters"][cluster_name]
+    opts = {
+        "cluster_id": cluster_name,
+        "endpoint": cluster["endpoint"],
+        "ssl": cluster.get("ssl", True),
+    }
+    for key in ("user", "password", "shortname", "oidc_token", "refresh_token"):
+        if key in cluster:
+            opts[key] = cluster[key]
+    return opts
 
 
 def decode_output(output, file_path):

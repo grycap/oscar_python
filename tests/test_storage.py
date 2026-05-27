@@ -1,3 +1,4 @@
+import json
 import pytest
 from unittest.mock import MagicMock, patch
 from oscar_python.storage import Storage
@@ -11,7 +12,10 @@ def mock_client_obj():
 @pytest.fixture
 def storage(mock_client_obj):
     mock_response = MagicMock()
-    mock_response.text = '{"minio_provider": {"access_key": "key","secret_key": "secret", "endpoint": "http://test.endpoint", "region": "us-east-1", "verify": false}}'
+    mock_response.text = json.dumps({
+        "minio_provider": {"access_key": "key", "secret_key": "secret",
+                           "endpoint": "http://test.endpoint",
+                           "region": "us-east-1", "verify": False}})
     with patch('oscar_python._utils.make_request', return_value=mock_response):
         return Storage(mock_client_obj)
 

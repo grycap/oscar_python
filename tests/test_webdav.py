@@ -34,7 +34,7 @@ def test_webdav_download_file(webdav):
     webdav.client = MagicMock(["download_sync"])
     webdav.client.download_sync.return_value = None
 
-    with patch("builtins.open", mock_open()) as mock_file:
+    with patch("builtins.open", mock_open()):
         webdav.download_file('local_path', 'remote_path/file.txt')
 
     webdav.client.download_sync.assert_called_with('remote_path/file.txt', 'local_path/file.txt')
