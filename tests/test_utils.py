@@ -78,7 +78,7 @@ def test_make_request_post():
         assert response.status_code == 200
         mock_request.assert_called_once_with(
             "post", "http://test.com/test",
-            headers={"Authorization": "Bearer test_token", "Content-Type": "application/json"},
+            headers={"Authorization": "Bearer test_token"},
             verify=True, data="test_data", timeout=60)
 
 
