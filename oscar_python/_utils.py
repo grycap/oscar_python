@@ -15,6 +15,7 @@
 import base64
 import json
 import os
+import time as _time
 import requests
 import liboidcagent as agent
 _DEFAULT_TIMEOUT = 60
@@ -32,21 +33,29 @@ def make_request(c, path, method, **kwargs):
 
     url = c.endpoint+path
 
-    if method in ["post", "put"]:
-        if "token" in kwargs.keys() and kwargs["token"]:
-            headers = get_headers_with_token(kwargs["token"])
-        req_kwargs = {"headers": headers, "verify": c.ssl, "timeout": timeout}
-        if "data" in kwargs.keys() and kwargs["data"]:
-            req_kwargs["data"] = kwargs["data"]
-        result = requests.request(method, url, **req_kwargs)
-    else:
-        result = requests.request(method, url, headers=headers, verify=c.ssl, timeout=timeout)
+    max_retries = 3
+    for attempt in range(max_retries):
+        if method in ["post", "put", "delete"]:
+            if "token" in kwargs.keys() and kwargs["token"]:
+                headers = get_headers_with_token(kwargs["token"])
+            req_kwargs = {"headers": headers, "verify": c.ssl, "timeout": timeout}
+            if "data" in kwargs.keys() and kwargs["data"]:
+                req_kwargs["data"] = kwargs["data"]
+                req_kwargs["headers"]["Content-Type"] = "application/json"
+            result = requests.request(method, url, **req_kwargs)
+        else:
+            result = requests.request(method, url, headers=headers, verify=c.ssl, timeout=timeout)
 
-    if "handle" in kwargs.keys() and kwargs["handle"] is False:
+        if "handle" in kwargs.keys() and kwargs["handle"] is False:
+            return result
+
+        if result.status_code == 500 and method == "put":
+            if attempt < max_retries - 1:
+                _time.sleep(0.5 * (2 ** attempt))
+                continue
+
+        result.raise_for_status()
         return result
-
-    result.raise_for_status()
-    return result
 
 
 def get_headers(c):
