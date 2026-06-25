@@ -33,6 +33,7 @@ _VOLUMES_PATH = "/system/volumes"
 _BUCKETS_PATH = "/system/buckets"
 _METRICS_PATH = "/system/metrics"
 _QUOTAS_USER_PATH = "/system/quotas/user"
+_FEDERATION_PATH = "/system/federation"
 
 
 # _JOB_PATH = "/job"
@@ -340,3 +341,30 @@ class Client(DefaultClient):
     def update_user_quota(self, user_id, cpu, memory):
         data = json.dumps({"cpu": cpu, "memory": memory})
         return utils.make_request(self, _QUOTAS_USER_PATH + "/" + user_id, _PUT, data=data)
+
+    """ Get federation members for a service """
+    def get_federation(self, service_name):
+        return utils.make_request(self, _FEDERATION_PATH + "/" + service_name, _GET)
+
+    """ Add federation members to a service """
+    def add_federation_members(self, service_name, members, clusters=None, storage_providers=None):
+        data = {"members": members}
+        if clusters:
+            data["clusters"] = clusters
+        if storage_providers:
+            data["storage_providers"] = storage_providers
+        return utils.make_request(self, _FEDERATION_PATH + "/" + service_name, _POST, data=json.dumps(data))
+
+    """ Update federation members of a service """
+    def update_federation_members(self, service_name, members, update, clusters=None, storage_providers=None):
+        data = {"members": members, "update": update}
+        if clusters:
+            data["clusters"] = clusters
+        if storage_providers:
+            data["storage_providers"] = storage_providers
+        return utils.make_request(self, _FEDERATION_PATH + "/" + service_name, _PUT, data=json.dumps(data))
+
+    """ Remove federation members from a service """
+    def remove_federation_members(self, service_name, members, delete=False):
+        data = {"members": members, "delete": delete}
+        return utils.make_request(self, _FEDERATION_PATH + "/" + service_name, _DELETE, data=json.dumps(data))

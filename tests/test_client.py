@@ -322,3 +322,91 @@ def test_update_user_quota(options):
         client.update_user_quota("test_user", "2", "4Gi")
         mock_request.assert_called_once_with(client, "/system/quotas/user/test_user", "put",
                                              data=json.dumps({"cpu": "2", "memory": "4Gi"}))
+
+
+def test_get_federation(options):
+    client = Client(options)
+    with patch('oscar_python._utils.make_request') as mock_request:
+        client.get_federation("test_service")
+        mock_request.assert_called_once_with(client, "/system/federation/test_service", "get")
+
+
+def test_add_federation_members(options):
+    client = Client(options)
+    members = [{"type": "oscar", "cluster_id": "c1", "service_name": "s1", "priority": 0}]
+    with patch('oscar_python._utils.make_request') as mock_request:
+        client.add_federation_members("test_service", members)
+        mock_request.assert_called_once_with(
+            client, "/system/federation/test_service", "post",
+            data=json.dumps({"members": members}))
+
+
+def test_add_federation_members_with_clusters(options):
+    client = Client(options)
+    members = [{"type": "oscar", "cluster_id": "c1", "service_name": "s1", "priority": 0}]
+    clusters = {"c1": {"endpoint": "https://c1.com", "auth_user": "u", "auth_password": "p"}}
+    with patch('oscar_python._utils.make_request') as mock_request:
+        client.add_federation_members("test_service", members, clusters=clusters)
+        mock_request.assert_called_once_with(
+            client, "/system/federation/test_service", "post",
+            data=json.dumps({"members": members, "clusters": clusters}))
+
+
+def test_add_federation_members_with_storage_providers(options):
+    client = Client(options)
+    members = [{"type": "oscar", "cluster_id": "c1", "service_name": "s1", "priority": 0}]
+    clusters = {"c1": {"endpoint": "https://c1.com", "auth_user": "u", "auth_password": "p"}}
+    storage_providers = {"minio": {"my-minio": {"endpoint": "https://minio.com", "access_key": "ak", "secret_key": "sk"}}}
+    with patch('oscar_python._utils.make_request') as mock_request:
+        client.add_federation_members("test_service", members, clusters=clusters,
+                                      storage_providers=storage_providers)
+        mock_request.assert_called_once_with(
+            client, "/system/federation/test_service", "post",
+            data=json.dumps({"members": members, "clusters": clusters,
+                             "storage_providers": storage_providers}))
+
+
+def test_update_federation_members(options):
+    client = Client(options)
+    members = [{"type": "oscar", "cluster_id": "c1", "service_name": "s1", "priority": 0}]
+    update = [{"type": "oscar", "cluster_id": "c1", "service_name": "s1", "priority": 5}]
+    with patch('oscar_python._utils.make_request') as mock_request:
+        client.update_federation_members("test_service", members, update)
+        mock_request.assert_called_once_with(
+            client, "/system/federation/test_service", "put",
+            data=json.dumps({"members": members, "update": update}))
+
+
+def test_update_federation_members_with_clusters(options):
+    client = Client(options)
+    members = [{"type": "oscar", "cluster_id": "c1", "service_name": "s1", "priority": 0}]
+    update = [{"type": "oscar", "cluster_id": "c1", "service_name": "s1", "priority": 5}]
+    clusters = {"c1": {"endpoint": "https://c1.com", "auth_user": "u", "auth_password": "new"}}
+    storage_providers = {"minio": {"my-minio": {"endpoint": "https://minio.com", "access_key": "ak", "secret_key": "sk"}}}
+    with patch('oscar_python._utils.make_request') as mock_request:
+        client.update_federation_members("test_service", members, update,
+                                         clusters=clusters, storage_providers=storage_providers)
+        mock_request.assert_called_once_with(
+            client, "/system/federation/test_service", "put",
+            data=json.dumps({"members": members, "update": update,
+                             "clusters": clusters, "storage_providers": storage_providers}))
+
+
+def test_remove_federation_members(options):
+    client = Client(options)
+    members = [{"type": "oscar", "cluster_id": "c1", "service_name": "s1", "priority": 0}]
+    with patch('oscar_python._utils.make_request') as mock_request:
+        client.remove_federation_members("test_service", members)
+        mock_request.assert_called_once_with(
+            client, "/system/federation/test_service", "delete",
+            data=json.dumps({"members": members, "delete": False}))
+
+
+def test_remove_federation_members_with_delete(options):
+    client = Client(options)
+    members = [{"type": "oscar", "cluster_id": "c1", "service_name": "s1", "priority": 0}]
+    with patch('oscar_python._utils.make_request') as mock_request:
+        client.remove_federation_members("test_service", members, delete=True)
+        mock_request.assert_called_once_with(
+            client, "/system/federation/test_service", "delete",
+            data=json.dumps({"members": members, "delete": True}))
