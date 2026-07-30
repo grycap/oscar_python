@@ -43,9 +43,12 @@ def make_request(c, path, method, **kwargs):
                 req_kwargs["data"] = kwargs["data"]
                 req_kwargs["headers"]["Content-Type"] = "application/json"
             if "headers" in kwargs.keys() and kwargs["headers"]:
-                for header in kwargs["headers"].split(","):
-                    chunck = header.split(":")
-                    req_kwargs["headers"][chunck[0]] = chunck[1].lstrip() 
+                try:
+                    for header in kwargs["headers"].split(","):
+                        chunck = header.split(":")
+                        req_kwargs["headers"][chunck[0]] = chunck[1].lstrip()
+                except Exception as e:
+                    print("error: " + str(e))
             result = requests.request(method, url, **req_kwargs)
         else:
             result = requests.request(method, url, headers=headers, verify=c.ssl, timeout=timeout)
