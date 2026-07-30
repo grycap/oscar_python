@@ -31,7 +31,8 @@ class DefaultClient(metaclass=abc.ABCMeta):
             path = _JOB_PATH + "/" + name
 
         response = utils.make_request(self, path, _POST, data=send_data,
-                                      token=token, timeout=kwargs.get("timeout"))
+                                      token=token, timeout=kwargs.get("timeout"),
+                                      headers=kwargs.get("headers"))
 
         if kwargs.get("output"):
             utils.decode_output(response.text, kwargs["output"])
