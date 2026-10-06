@@ -12,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import requests
+
 from aiohttp import ClientError
 import boto3
 from oscar_python._providers._providers_base import StorageProvider
+from requests.exceptions import RequestException
 
 
 class S3(StorageProvider):
@@ -80,3 +83,17 @@ class S3(StorageProvider):
             except ClientError as err:
                 print("Error downloading file: ", err)
                 return False
+
+def upload_url(self, url, remote_path):
+    bucket_name = remote_path.split('/')[0]
+    file_key = remote_path.split('/', 1)[1]
+    print("Uploading from URL '{0}' to bucket '{1}' with key '{2}'".format(url, bucket_name, file_key))
+    try:
+        with requests.get(url, stream=True, timeout=(5, 60)) as response:
+            response.raise_for_status()
+            content_type = response.headers.get("content-type", "application/octet-stream")
+            self.client.upload_fileobj(response.raw, bucket_name, file_key, ExtraArgs={"ContentType": content_type})
+        return True
+    except (RequestException, ClientError) as err:
+        print("Error uploading URL: ", err)
+        return False
