@@ -27,7 +27,7 @@ def test_run_service_with_input_and_token(mock_decode_output, mock_encode_input,
     mock_encode_input.assert_called_once_with("test_input")
     mock_make_request.assert_called_once_with(
         client, _RUN_PATH+"/test_service", _POST,
-        data="encoded_input", token="test_token", timeout=30)
+        data="encoded_input", token="test_token", timeout=30,  headers=None)
     mock_decode_output.assert_called_once_with("response_text", "output_file")
     assert response == mock_response
 
@@ -45,7 +45,7 @@ def test_run_service_with_input_no_token(mock_encode_input, mock_make_request, c
     mock_encode_input.assert_called_once_with("test_input")
     mock_make_request.assert_called_once_with(
         client, _RUN_PATH+"/test_service", _POST,
-        data="encoded_input", token="test_token", timeout=None)
+        data="encoded_input", token="test_token", timeout=None, headers=None)
     assert response == mock_response
 
 
@@ -57,9 +57,9 @@ def test_run_service_no_input(mock_make_request, client):
 
     response = client.run_service("test_service", input="data")
     mock_make_request.assert_called_with(client, _RUN_PATH+"/test_service", _POST,
-                                         token="test_token", data=b'ZGF0YQ==', timeout=None)
+                                         token="test_token", data=b'ZGF0YQ==', timeout=None, headers=None)
 
     response = client.run_service("test_service", input="data", async_call=True, timeout=30)
     mock_make_request.assert_called_with(client, _JOB_PATH+"/test_service", _POST,
-                                         token="test_token", data=b'ZGF0YQ==', timeout=30)
+                                         token="test_token", data=b'ZGF0YQ==', timeout=30, headers=None)
     assert response == mock_response
