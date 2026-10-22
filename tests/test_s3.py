@@ -28,6 +28,34 @@ def test_s3_upload_file(s3_client):
     assert result is True
 
 
+def test_s3_upload_url(s3_client):
+    s3_client.client = MagicMock(["upload_fileobj"])
+    response = MagicMock()
+    response.headers = {"content-type": "image/png"}
+
+    with patch("oscar_python._providers._s3.requests.get") as mock_get:
+        mock_get.return_value.__enter__.return_value = response
+
+        result = s3_client.upload_url(
+            "https://example.com/image.png",
+            "test_bucket/images/image.png"
+        )
+
+    mock_get.assert_called_once_with(
+        "https://example.com/image.png",
+        stream=True,
+        timeout=(5, 60)
+    )
+    response.raise_for_status.assert_called_once_with()
+    s3_client.client.upload_fileobj.assert_called_once_with(
+        response.raw,
+        "test_bucket",
+        "images/image.png",
+        ExtraArgs={"ContentType": "image/png"}
+    )
+    assert result is True
+
+
 def test_s3_download_file(s3_client):
     s3_client.client = MagicMock(["download_fileobj"])
     with patch("builtins.open", mock_open()) as mock_file:
